@@ -1,0 +1,35 @@
+@model WebApi.Models.ExternalLoginConfirmationViewModel
+@{
+    ViewBag.Title = "Register";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>Associate your @ViewBag.LoginProvider account.</h3>
+
+@using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <h4>Association Form</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <p class="text-info">
+        你以成功验证
+        请输入邮件
+    </p>
+    <div class="form-group row">
+        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 col-form-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="offset-md-2 col-md-10">
+            <input type="submit" class="btn btn-secondary" value="Register" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,163 @@
+﻿
+@section Search{
+<form method="get" class="form-inline" >
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search">
+    <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+}
+<div class="row">
+    <!-- List of products（产品列表） -->
+    <div class="col-6">
+        <h1>Products</h1>
+        <ul id="products" data-bind="foreach:products">
+            <li data-bind="with:product" class="mb-3 list-unstyled row">
+                <span data-bind="text: Name"></span>
+                <span class="mr-auto" data-bind="text: '$' + Price"></span>
+                <button class="btn btn-primary btn-sm" data-bind="click: $parent.addToCart">添加到购物车</button>
+            </li>
+        </ul>
+       
+    </div>
+    <!--Cart（购物车） -->
+    <div id="cart" class="col-6" data-bind="visible:cart().length>0">
+        <h1>Your Cart</h1>
+        <table class="details ui-widget-content">
+            <thead>
+                <tr>
+                 
+                    <th>产品名称</th>
+                    <th>产品价格</th>
+                    <th>数量</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:cart">
+                <tr data-bind="with:product">
+                 
+                    <td data-bind="text:Name"></td>
+                    <td data-bind="text:Price"></td>
+                    <td data-bind="text:$parent.Quantity"></td>
+                    <td ><a href="#" data-bind="click: $parent.removeFromCart">删除</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <input class="btn btn-primary" type="button" value="创建订单" data-bind="click:$root.addOrder"/>
+    </div>
+</div>
+<div id="orders-area" class="row">
+    <!-- List of orders -->
+    <div class="col-4">
+        <h1>你的订单</h1>
+        <ul id="orders" data-bind="foreach:orders">
+            <li>
+                <a data-bind="text:'订单 '+$data.Id,click:$root.getDetails" href="#"></a>
+            </li>
+
+        </ul>
+    </div>
+    <!-- Order Details（订单细节） -->
+    <div id="order-details" class="col-8" data-bind="if:orderDetails()">
+        <h2>订单细节 #<span></span></h2>
+        <table class="details ui-widget-content">
+            <thead>
+                <tr>
+                    <th>产品名称</th>
+                    <th> 产品价格</th>
+                    <th>数量</th>
+                    <th> 合计</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:orderDetails().details">
+                <tr>
+                    <td data-bind="text:ProductName"></td>
+                    <td data-bind="text:Price"></td>
+                    <td data-bind="text:Quantity"></td>
+                    <td data-bind="text:(Price*Quantity).toFixed(2)"></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>总额: <span data-bind="text:orderDetails().total()"></span></p>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+    <script>
+        function AppViewModel() {
+            var self= this;
+            self.products = ko.observableArray();
+            self.cart = ko.observableArray();
+            self.orders = ko.observableArray();
+            self.orderDetails = ko.observable();
+            var productUrl = "/api/Products/";
+            var orderUrl = "/api/Orders/";
+            function ProductViewModel(root, product) {
+                var self = this;
+                self.product = product;
+                self.Quantity = ko.observable(0);
+                self.addToCart = function () {
+                    
+                    var q = self.Quantity();
+                    if (self.Quantity() == 0) {
+                        root.cart.push(self);
+                    }
+                    self.Quantity(q+1);
+                };
+                self.removeFromCart = function () {
+                    root.cart.remove(self);
+                    self.Quantity(0);
+                };
+            }
+            function OrderDetailsViewModel(order) {
+                var self = this;
+                self.details = order.Details;
+                this.total = function () {
+                    var sum=0;
+                    $.each(self.details, function (index, item) {
+                        sum += item.Price * item.Quantity;
+                    });
+                    return "$" + sum;
+                };
+               
+            }
+            self.clearCart = function () {
+                var items = self.cart.removeAll();
+                $.each(items, function (index, item) {
+                    item.Quantity(0);
+                })
+            };
+            self.addOrder = function () {
+                var orderDetails = new Array();
+                $.each(self.cart(), function (index, item) {
+                    orderDetails.push({ ProductId: item.product.Id, Quantity: item.Quantity })
+                });
+                var order = { Details: orderDetails };
+
+                $.post(orderUrl, order, function (data) {
+                    self.clearCart();
+                    self.orders.push(data);
+                });
+            };
+            self.getDetails = function (order) {
+                $.get(orderUrl + order.Id, null, function (order) {
+                    self.orderDetails(new OrderDetailsViewModel(order));
+                });
+               
+            };
+            self.loadOrders = function () {
+                $.get(orderUrl, null, function (data) {
+                    self.orders(data);
+                });
+            };
+            self.loadProducts = function () {
+                $.get(productUrl, null, function (data) {
+                    $.each(data, function (index, item) {
+                        self.products.push(new ProductViewModel(self, item));
+                    });
+                });
+            };
+            self.loadOrders();
+            self.loadProducts();
+        }
+        ko.applyBindings(new AppViewModel());
+    </script>
+}

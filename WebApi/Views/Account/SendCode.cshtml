@@ -1,0 +1,21 @@
+@model WebApi.Models.SendCodeViewModel
+@{
+    ViewBag.Title = "Send Verification Code";
+}
+
+<h2>@ViewBag.Title.</h2>
+
+@using (Html.BeginForm("SendCode", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post, new {  role = "form" })) {
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-8">
+            Two Factor Authentication Provider:
+            @Html.DropDownListFor(model => model.SelectedProvider, Model.Providers,new { @class="custom-select"})
+            <input type="submit" value="Submit" class="btn btn-secondary" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
