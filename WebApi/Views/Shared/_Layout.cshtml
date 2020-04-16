@@ -9,9 +9,9 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 
-<body>
+<body class="pt-5">
     <div class="navbar fixed-top navbar-expand-sm navbar-dark bg-primary ">
-        <div class="container">
+        <div class="container-fluid" style="width:90%;">
             @Html.ActionLink("ProductStore", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="navbar-toggler-icon"></span>
@@ -33,6 +33,7 @@
             @Html.Partial("_LoginPartial")
         </div>
     </div>
+    @RenderSection("Carousel",false)
     <div class="container body-content">
         @RenderBody()
         <hr />
