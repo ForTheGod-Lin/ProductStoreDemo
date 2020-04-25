@@ -1,10 +1,8 @@
-﻿using System.Globalization;
-using WebApi.Models;
+﻿using WebApi.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -18,9 +16,10 @@ namespace WebApi.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager)
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
             UserManager = userManager;
+            SignInManager = signInManager;
         }
 
         private ApplicationUserManager _userManager;
@@ -28,8 +27,7 @@ namespace WebApi.Controllers
         {
             get
             {
-                return Microsoft.AspNet.Identity.Owin.OwinContextExtensions.GetUserManager<ApplicationUserManager>(HttpContext.GetOwinContext());
-                
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             }
             private set
             {
@@ -39,30 +37,23 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/Login
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            var model = new LoginViewModel()
-            {
-                Email = "admin@admin.com",
-                Password = "123456"
-            };
-            return View(model);
+            return View();
         }
 
-        private SignInHelper _helper;
+        private ApplicationSignInManager _signInManager;
 
-        private SignInHelper SignInHelper
+        public ApplicationSignInManager SignInManager
         {
             get
             {
-                if (_helper == null)
-                {
-                    _helper = new SignInHelper(UserManager, AuthenticationManager);
-                }
-                return _helper;
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
+            private set { _signInManager = value; }
         }
 
         //
@@ -79,17 +70,20 @@ namespace WebApi.Controllers
 
             // This doen't count login failures towards lockout only two factor authentication
             // To enable password failures to trigger lockout, change to shouldLockout: true
-            var result = await SignInHelper.PasswordSignIn(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
+                    if (!UserManager.IsEmailConfirmed(UserManager.FindByName(model.Email).Id))
+                    {
+                        AuthenticationManager.SignOut();
+                        return View("DisplayEmail");
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
-                case SignInStatus.InvalidEmail:
-                    return View("DisplayEmail");
-                case SignInStatus.RequiresTwoFactorAuthentication:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
+                case SignInStatus.RequiresVerification:
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl,  model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
@@ -99,21 +93,21 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/VerifyCode
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult> VerifyCode(string provider, string returnUrl)
+        public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
             // Require that the user has already logged in via username/password or external login
-            if (!await SignInHelper.HasBeenVerified())
+            if (!await SignInManager.HasBeenVerifiedAsync())
             {
                 return View("Error");
             }
-            var user = await UserManager.FindByIdAsync(await SignInHelper.GetVerifiedUserIdAsync());
+            var user = await UserManager.FindByIdAsync(await SignInManager.GetVerifiedUserIdAsync());
             if (user != null)
             {
-                // To exercise the flow without actually sending codes, uncomment the following line
                 ViewBag.Status = "For DEMO purposes the current " + provider + " code is: " + await UserManager.GenerateTwoFactorTokenAsync(user.Id, provider);
             }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl });
+            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
         //
@@ -128,7 +122,7 @@ namespace WebApi.Controllers
                 return View(model);
             }
 
-            var result = await SignInHelper.TwoFactorSignIn(model.Provider, model.Code, isPersistent: false, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -144,6 +138,7 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/Register
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult Register()
         {
@@ -164,7 +159,7 @@ namespace WebApi.Controllers
                 if (result.Succeeded)
                 {
                     var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
                     await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     ViewBag.Link = callbackUrl;
                     return View("DisplayEmail");
@@ -178,6 +173,7 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/ConfirmEmail
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
@@ -186,16 +182,12 @@ namespace WebApi.Controllers
                 return View("Error");
             }
             var result = await UserManager.ConfirmEmailAsync(userId, code);
-            if (result.Succeeded)
-            {
-                return View("ConfirmEmail");
-            }
-            AddErrors(result);
-            return View();
+            return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
         //
         // GET: /Account/ForgotPassword
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
@@ -219,7 +211,7 @@ namespace WebApi.Controllers
                 }
 
                 var code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id,  code }, protocol: Request.Url.Scheme);
                 await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
                 ViewBag.Link = callbackUrl;
                 return View("ForgotPasswordConfirmation");
@@ -231,6 +223,7 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/ForgotPasswordConfirmation
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
@@ -239,6 +232,7 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/ResetPassword
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
@@ -273,6 +267,7 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/ResetPasswordConfirmation
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
@@ -292,17 +287,18 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/SendCode
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult> SendCode(string returnUrl)
+        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
-            var userId = await SignInHelper.GetVerifiedUserIdAsync();
+            var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
             {
                 return View("Error");
             }
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl });
+            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
         //
@@ -312,21 +308,22 @@ namespace WebApi.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SendCode(SendCodeViewModel model)
         {
-            // Generate the token and send it
             if (!ModelState.IsValid)
             {
                 return View();
             }
 
-            if (!await SignInHelper.SendTwoFactorCode(model.SelectedProvider))
+            // Generate the token and send it
+            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl });
+            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider,  model.ReturnUrl,  model.RememberMe });
         }
 
         //
         // GET: /Account/ExternalLoginCallback
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -337,14 +334,14 @@ namespace WebApi.Controllers
             }
 
             // Sign in the user with this external login provider if the user already has a login
-            var result = await SignInHelper.ExternalSignIn(loginInfo, isPersistent: false);
+            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
             switch (result)
             {
                 case SignInStatus.Success:
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
-                case SignInStatus.RequiresTwoFactorAuthentication:
+                case SignInStatus.RequiresVerification:
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
                 default:
@@ -382,7 +379,7 @@ namespace WebApi.Controllers
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
-                        await SignInHelper.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -405,20 +402,11 @@ namespace WebApi.Controllers
 
         //
         // GET: /Account/ExternalLoginFailure
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
             return View();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && _userManager != null)
-            {
-                _userManager.Dispose();
-                _userManager = null;
-            }
-            base.Dispose(disposing);
         }
 
         #region Helpers

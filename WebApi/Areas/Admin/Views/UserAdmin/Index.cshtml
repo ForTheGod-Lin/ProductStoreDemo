@@ -1,0 +1,133 @@
+﻿@model WebApi.Models.ApplicationUser
+
+@{
+    Layout = null;
+}
+
+
+
+
+    <table id="dg" title="用户列表" class="easyui-datagrid" style="width:100%;height:100%";margin:0;
+           url="@Url.Action("GetAll", new { Area = "Admin" })"
+           toolbar="#toolbar" pagination="true"
+           rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th field="Id" width="100">Id</th>
+                <th field="UserName" width="100">用户名</th>
+                <th field="PhoneNumber" width="100">手机号</th>
+                <th field="PhoneNumberConfirmed" width="100">手机号验证</th>
+                <th field="Email" width="100">电子邮箱</th>
+                <th field="EmailConfirmed" width="100">邮箱验证</th>
+                <th field="StatusString" width="100">账号状态</th>
+
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">添加</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
+    </div>
+
+    <div id="dlg" class="easyui-dialog" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
+        <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+            <h3>用户信息</h3>
+    @Html.HiddenFor(model=>model.Id)
+            <div style="margin-bottom:10px">
+
+                @Html.TextBoxFor(model => model.UserName, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.UserName), style = "width:100%" } )
+            
+            </div>
+            <div style="margin-bottom:10px">
+
+                @Html.TextBoxFor(model => model.PhoneNumber,  new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.PhoneNumber), style = "width:100%" } )
+            
+            </div>
+         
+            <div style="margin-bottom:10px">
+
+                @Html.TextBox(Html.NameFor(model=>model.PhoneNumberConfirmed).ToString(),"true", new { @class = "easyui-checkbox",label = Html.DisplayNameFor(model => model.PhoneNumberConfirmed)} )
+             
+            </div>
+            <div style="margin-bottom:10px">
+
+                @Html.TextBoxFor(model => model.Email,  new { @class = "easyui-textbox", required = "true", validType = "email",label = Html.DisplayNameFor(m => m.Email), style = "width:100%" })
+            
+            </div>
+            <div style="margin-bottom:10px">
+
+                @Html.TextBox(Html.NameFor(model => model.EmailConfirmed).ToString(), "true", new { @class = "easyui-checkbox" , label = Html.DisplayNameFor(model => model.EmailConfirmed) })
+              
+            </div>
+            <div style="margin-bottom:10px">
+
+                @Html.DropDownListFor(model => model.Status, new SelectList(Enum.GetNames(typeof(WebApi.Models.Status))), new { @class = "easyui-combobox", required = "true", label = Html.DisplayNameFor(m => m.Status), style = "width:100%" })
+            
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">确定</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="$('#dlg').dialog('close')" style="width:90px">取消</a>
+    </div>
+  
+    <script type="text/javascript">
+        var url;
+        function newUser() {
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle', '添加用户');
+            $('#fm').form('clear');
+            url = '/Admin/UserAdmin/Create';
+        }
+        function editUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑用户');
+                $.get("/Admin/UserAdmin/Get", { userId: row.Id }, function (data) {
+                    $('#fm').form('load', data);
+                });
+
+                url = '/Admin/UserAdmin/Update';
+            }
+        }
+        function saveUser() {
+            $('#fm').form('submit', {
+                url: url,
+                onSubmit: function () {
+                    return $(this).form('validate');
+                },
+                success: function (result) {
+
+                    if (result == "OK") {
+                        $('#dlg').dialog('close');
+                        $('#dg').datagrid('reload');
+
+                    } else {
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result
+                        });
+                    }
+                }
+            });
+        }
+        function destroyUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $.messager.confirm('确认', '你确定要删除该用户？', function (r) {
+                    if (r) {
+                        $.post('/Admin/UserAdmin/Delete', { userId: row.Id }, function (result) {
+                            if (result == "OK") {
+                                $('#dg').datagrid('reload');	// reload the user data
+                            } else {
+                                $.messager.show({	// show error message
+                                    title: 'Error',
+                                    msg: result
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    </script>
