@@ -13,7 +13,7 @@
            rownumbers="true" fitColumns="true" singleSelect="true">
         <thead>
             <tr>
-                <th field="Id" width="100">Id</th>
+                <th field="Id" width="100">主键</th>
                 <th field="UserName" width="100">用户名</th>
                 <th field="PhoneNumber" width="100">手机号</th>
                 <th field="PhoneNumberConfirmed" width="100">手机号验证</th>
@@ -33,7 +33,6 @@
     <div id="dlg" class="easyui-dialog" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
         <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
             <h3>用户信息</h3>
-    @Html.HiddenFor(model=>model.Id)
             <div style="margin-bottom:10px">
 
                 @Html.TextBoxFor(model => model.UserName, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.UserName), style = "width:100%" } )
@@ -83,11 +82,11 @@
             var row = $('#dg').datagrid('getSelected');
             if (row) {
                 $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑用户');
-                $.get("/Admin/UserAdmin/Get", { userId: row.Id }, function (data) {
+                $.get("/Admin/UserAdmin/Get", { id: row.Id }, function (data) {
                     $('#fm').form('load', data);
                 });
 
-                url = '/Admin/UserAdmin/Update';
+                url = '/Admin/UserAdmin/Update?id='+row.Id;
             }
         }
         function saveUser() {

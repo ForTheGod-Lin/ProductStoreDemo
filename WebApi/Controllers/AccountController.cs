@@ -42,7 +42,12 @@ namespace WebApi.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            var mode = new LoginViewModel()
+            {
+                Email = "admin@example.com"
+            };
+            ModelState.AddModelError("Password", "密码123456");
+            return View(mode);
         }
 
         private ApplicationSignInManager _signInManager;

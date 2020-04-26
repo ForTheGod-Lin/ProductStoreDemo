@@ -12,15 +12,17 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    [Authorize(Roles ="Admin")]
+  
     public class AdminController : ApiController
     {
         private ProductStore db = new ProductStore();
 
         // GET: api/Products
-        public IQueryable<Product> GetProducts()
+        public object GetProducts(int page=1,int rows=10)
         {
-            return db.Products;
+           var model= db.Products;
+            return new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip(page - 1).Take(rows) };
+
         }
 
         // GET: api/Products/5

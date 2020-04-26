@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using WebApi.Models;
-namespace WebApi.Areas.Admin.Controllers
+namespace WebApi.Controllers
 {
     public class UserController : ApiController
     {

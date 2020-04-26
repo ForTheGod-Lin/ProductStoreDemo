@@ -5,6 +5,7 @@
     using System.Linq;
     using System.ComponentModel.DataAnnotations;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
     public class ProductStore : DbContext
     {
         //您的上下文已配置为从您的应用程序的配置文件(App.config 或 Web.config)
@@ -18,10 +19,14 @@
         {
             Database.SetInitializer(new InitSerializer());
         }
-
+        public static ProductStore Create()
+        {
+            return new ProductStore();
+        }
        public DbSet<Product> Products { get; set; }
        public DbSet<Order> Orders { get; set; }
        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
     }
    public class InitSerializer : DropCreateDatabaseIfModelChanges<ProductStore>
     {
@@ -35,17 +40,6 @@
             };
 
             products.ForEach(p => context.Products.Add(p));
-        
-
-            var order = new Order() { Customer = "Bob" };
-            var od = new List<OrderDetail>()
-            {
-                new OrderDetail() { Product = products[0], Quantity = 2, Order = order},
-                new OrderDetail() { Product = products[1], Quantity = 4, Order = order }
-            };
-            context.Orders.Add(order);
-            od.ForEach(o => context.OrderDetails.Add(o));
-
             context.SaveChanges();
 
         }
@@ -64,8 +58,9 @@
     {
         public int Id { get; set; }
         [Required]
-        public string Customer { get; set; }
-
+        public string CustomerId { get; set; }
+        [ForeignKey("CustomerId")]
+        public ApplicationUser Customer { get; set; }
         // Navigation property
         // 导航属性
         public ICollection<OrderDetail> OrderDetails { get; set; }
@@ -74,13 +69,23 @@
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
+
         public int OrderId { get; set; }
         public int ProductId { get; set; }
-
-        // Navigation properties
-        // 导航属性
         public Product Product { get; set; }
         public Order Order { get; set; }
+    }
+  
+    public class CartItem
+    {
+        public int Id { get; set; }
+        public int Quantity { get; set; }
+
+        public string UserId { get; set; }
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
+        [ForeignKey("UserId")]
+   public ApplicationUser User { get; set; }
     }
 
 }

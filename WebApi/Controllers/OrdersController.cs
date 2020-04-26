@@ -55,7 +55,7 @@ namespace WebApi.Controllers
             }
             var order = new Order()
             {
-                Customer = "Lin",
+                CustomerId = "Lin",
                 OrderDetails = dto.Details.Select(d => new OrderDetail()
                 {
                     ProductId = d.ProductId,

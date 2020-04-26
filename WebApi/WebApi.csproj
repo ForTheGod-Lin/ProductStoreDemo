@@ -191,9 +191,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ProductAdminController.cs" />
     <Compile Include="Areas\Admin\Controllers\RoleAdminController.cs" />
     <Compile Include="Areas\Admin\Controllers\UserAdminController.cs" />
-    <Compile Include="Areas\Admin\Controllers\UserController.cs" />
+    <Compile Include="Areas\Admin\Controllers\WebApiControllers\ProductController.cs" />
+    <Compile Include="Areas\Admin\Controllers\WebApiControllers\UserController.cs" />
     <Compile Include="Areas\Admin\Models\SearchModel.cs" />
     <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
     <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
@@ -224,23 +226,33 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
-    <Compile Include="Controllers\RoleAdminController.cs" />
-    <Compile Include="Controllers\UserAdminController.cs" />
+    <Compile Include="Controllers\SampleControllers\RoleAdminController.cs" />
+    <Compile Include="Controllers\SampleControllers\UserAdminController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\AdminViewModel.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\OrderDTO.cs" />
-    <Compile Include="Models\ProductDTO.cs" />
-    <Compile Include="Models\ProductStore.cs" />
+    <Compile Include="Library\Common\ValidateCode.cs" />
+    <Compile Include="Library\Repositries\IRepositries.cs" />
+    <Compile Include="Library\Repositries\IRepositryBase.cs" />
+    <Compile Include="Library\Repositries\Repositries.cs" />
+    <Compile Include="Library\Repositries\RepositryBase.cs" />
+    <Compile Include="Library\Repositries\RepositryProvider.cs" />
+    <Compile Include="Library\Services\IServiceBase.cs" />
+    <Compile Include="Library\Models\ViewModels\AccountViewModels.cs" />
+    <Compile Include="Library\Models\ViewModels\AdminViewModel.cs" />
+    <Compile Include="Library\Models\IdentityModels.cs" />
+    <Compile Include="Library\Models\ViewModels\ManageViewModels.cs" />
+    <Compile Include="Library\Models\ViewModels\OrderDTO.cs" />
+    <Compile Include="Library\Models\ViewModels\ProductDTO.cs" />
+    <Compile Include="Library\Models\ProductStore.cs" />
+    <Compile Include="Library\Services\IServices.cs" />
+    <Compile Include="Library\Services\ServiceBase.cs" />
+    <Compile Include="Library\Services\Services.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -1194,6 +1206,7 @@
     <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <Content Include="Areas\Admin\Views\RoleAdmin\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\ProductAdmin\Index.cshtml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -1340,6 +1353,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
+    <Content Include="Views\Home\CartIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Views\Shared\EditorTemplates\" />

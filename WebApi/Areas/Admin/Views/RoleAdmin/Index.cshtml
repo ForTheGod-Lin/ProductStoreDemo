@@ -7,14 +7,14 @@
 
 
 
-    <table id="dg" title="角色列表" class="easyui-datagrid" style="width:100%;height:100%";margin:0;
+    <table id="dg1" title="角色列表" class="easyui-datagrid" style="width:100%;height:100%";margin:0;
            url="@Url.Action("GetAll", new { Area = "Admin" })"
            toolbar="#toolbar" pagination="true"
            rownumbers="true" fitColumns="true" singleSelect="true">
         <thead>
             <tr>
                 <th field="Id" width="100">主键</th>
-                <th field="UserName" width="100">角色名</th>
+                <th field="Name" width="100">角色名</th>
             </tr>
         </thead>
     </table>
@@ -24,10 +24,9 @@
         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
     </div>
 
-    <div id="dlg" class="easyui-dialog" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
-        <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+    <div id="dlg1" class="easyui-dialog" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg1-buttons'">
+        <form id="fm1" method="post" novalidate style="margin:0;padding:20px 50px">
             <h3>角色信息</h3>
-    @Html.HiddenFor(model=>model.Id)
             <div style="margin-bottom:10px">
 
                 @Html.TextBoxFor(model => model.Id, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.Id), style = "width:100%" } )
@@ -42,31 +41,31 @@
             
         </form>
     </div>
-    <div id="dlg-buttons">
-        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">确定</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="$('#dlg').dialog('close')" style="width:90px">取消</a>
+    <div id="dlg1-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton " iconCls="icon-ok" onclick="saveUser()" style="width:90px">确定</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="$('#dlg1').dialog('close')" style="width:90px">取消</a>
     </div>
   
     <script type="text/javascript">
         var url;
         function newUser() {
-            $('#dlg').dialog('open').dialog('center').dialog('setTitle', '添加用户');
-            $('#fm').form('clear');
+            $('#dlg1').dialog('open').dialog('center').dialog('setTitle', '添加角色');
+            $('#fm1').form('clear');
             url = '/Admin/RoleAdmin/Create';
         }
         function editUser() {
-            var row = $('#dg').datagrid('getSelected');
+            var row = $('#dg1').datagrid('getSelected');
             if (row) {
-                $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑角色');
-                $.get("/Admin/RoleAdmin/Get", { userId: row.Id }, function (data) {
-                    $('#fm').form('load', data);
+                $('#dlg1').dialog('open').dialog('center').dialog('setTitle', '编辑角色');
+                $.get("/Admin/RoleAdmin/Get", { id: row.Id }, function (data) {
+                    $('#fm1').form('load', data);
                 });
 
-                url = '/Admin/RoleAdmin/Update';
+                url = '/Admin/RoleAdmin/Update?id=' + row.Id;
             }
         }
         function saveUser() {
-            $('#fm').form('submit', {
+            $('#fm1').form('submit', {
                 url: url,
                 onSubmit: function () {
                     return $(this).form('validate');
@@ -74,8 +73,8 @@
                 success: function (result) {
 
                     if (result == "OK") {
-                        $('#dlg').dialog('close');
-                        $('#dg').datagrid('reload');
+                        $('#dlg1').dialog('close');
+                        $('#dg1').datagrid('reload');
 
                     } else {
                         $.messager.show({
@@ -87,15 +86,15 @@
             });
         }
         function destroyUser() {
-            var row = $('#dg').datagrid('getSelected');
+            var row = $('#dg1').datagrid('getSelected');
             if (row) {
                 $.messager.confirm('确认', '你确定要删除？', function (r) {
                     if (r) {
                         $.post('/Admin/RoleAdmin/Delete', { userId: row.Id }, function (result) {
                             if (result == "OK") {
-                                $('#dg').datagrid('reload');	// reload the user data
+                                $('#dg1').datagrid('reload');	
                             } else {
-                                $.messager.show({	// show error message
+                                $.messager.show({	
                                     title: 'Error',
                                     msg: result
                                 });

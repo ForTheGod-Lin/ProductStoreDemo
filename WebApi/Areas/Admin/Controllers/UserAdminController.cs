@@ -5,30 +5,28 @@ using System.Web;
 using System.Web.Mvc;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.Owin;
-using WebApi.Areas.Admin.Models;
 using System.Threading.Tasks;
 namespace WebApi.Areas.Admin.Controllers
 {
     public class UserAdminController : Controller
     {
-        public ApplicationUserManager UserManager
-        {
-            get { return HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
-        }
-        [ChildActionOnly]
         public ActionResult Index()
         {
             return View();
+        }
+        public ApplicationUserManager UserManager
+        {
+            get { return HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
         }
         public ActionResult GetAll(SearchModel search,int index=1,int pageSize = 10)
         {
             var model = UserManager.Users;
            
-            return Json(new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip(index - 1).Take(pageSize) }, JsonRequestBehavior.AllowGet);
+            return Json(new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip(index - 1).Take(pageSize) });
         }
-        public async Task<ActionResult> Get(string userId)
+        public async Task<ActionResult> Get(string id)
         {
-            var user = await UserManager.FindByIdAsync(userId);
+            var user = await UserManager.FindByIdAsync(id);
             if (user != null)
             {
                 return Json(user, JsonRequestBehavior.AllowGet);
@@ -37,20 +35,19 @@ namespace WebApi.Areas.Admin.Controllers
         }
         public async Task<ActionResult>  Create(ApplicationUser user)
         {
-            HttpContext.GetOwinContext().Get<ApplicationDbContext>().Configuration.ValidateOnSaveEnabled = false;
             if (ModelState.IsValid)
             {
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded) return Content("OK");
                 else ModelState.AddModelError("", result.Errors.First());
             }
-            return Content(string.Join(",", ModelState.Where(m=>m.Value.Errors.Count()!=0).Select(m=> String.Join(",", m.Value.Errors.Select(e=>e.ErrorMessage)))));
+            return Content(string.Join(",", ModelState.Where(m=>m.Value.Errors.Count()!=0).Select(m=> string.Join(",", m.Value.Errors.Select(e=>e.ErrorMessage)))));
         }
-        public async Task<ActionResult> Update(ApplicationUser user)
+        public async Task<ActionResult> Update(ApplicationUser user,string id)
         {
             if (ModelState.IsValid)
             {
-                var userInfo = await UserManager.FindByIdAsync(user.Id);
+                var userInfo = await UserManager.FindByIdAsync(id);
                 if (userInfo != null)
                 {
                     userInfo.UserName = user.UserName;

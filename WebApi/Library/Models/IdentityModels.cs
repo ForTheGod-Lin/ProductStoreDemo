@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 namespace WebApi.Models {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public enum Status
@@ -18,12 +19,13 @@ namespace WebApi.Models {
         Boy,
         Girl
     }
-    public class ApplicationUser : IdentityUser {
+    public class ApplicationUser : IdentityUser
+    {
         public ApplicationUser()
         {
-            
+
         }
-        [Display(Name ="真实姓名")]
+        [Display(Name = "真实姓名")]
         public string RealName { get; set; }
         [Display(Name = "地址")]
         public string Address { get; set; }
@@ -39,16 +41,17 @@ namespace WebApi.Models {
         public Nullable<DateTime> BirthDate { get; set; }
         [Display(Name = "性别")]
         public Sex Sex { get; set; }
-        [Display(Name ="账号状态")]
+        [Display(Name = "账号状态")]
         public Status Status { get; set; }
         [NotMapped]
         public string StatusString
         {
             get { return Status.ToString(); }
         }
-       
-     
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager) {
+        public virtual ICollection<CartItem> CartItems { get; set; }
+        public virtual ICollection<OrderDetail> Orders { get; set; }
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
+        {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
             // Add custom user claims here
