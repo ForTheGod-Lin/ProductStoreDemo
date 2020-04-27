@@ -15,7 +15,7 @@ namespace WebApi.Repositries
         IQueryable<T> FindPagedList<S>(Expression<Func<T, bool>> where, Expression<Func<T, S>> order, bool isAsc, int page, int size);
         T Find(Expression<Func<T, bool>> where);
         bool Exist(Expression<Func<T,bool>> any);
-        T Add(T model);
+        bool Add(T model);
         bool Update(T model);
         bool Delete(T model);
     }

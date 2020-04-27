@@ -13,11 +13,15 @@ namespace WebApi.Controllers
     {
         private ICartItemService context = new CartItemService();
         // GET: api/Cart
-     
+     public IEnumerable<CartItem> Get(string id)
+        {
+            return context.Get(id);
+        }
 
         // POST: api/Cart
-        public void Post([FromBody]string value)
+        public void Post([FromBody]CartItem model)
         {
+            context.AddCartItemByName(model);
         }
 
         // PUT: api/Cart/5
@@ -31,10 +35,9 @@ namespace WebApi.Controllers
             if (context.Delete(id)) return Request.CreateResponse(HttpStatusCode.NoContent);
             else throw new HttpRequestException();
         }
-        public HttpResponseMessage DeleteAll([FromBody]string userId)
+        public int DeleteAll(string userId)
         {
-            if (context.DeleteAllToOrder(userId)) return Request.CreateResponse(HttpStatusCode.NoContent);
-            else throw new HttpRequestException();
+            return context.DeleteAllToOrder(userId);
         }
     }
 }

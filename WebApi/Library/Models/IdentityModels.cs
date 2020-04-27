@@ -7,6 +7,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
+using Microsoft.AspNet.Identity.Owin;
+using System.Web;
+using System.Data.Entity.Migrations;
 namespace WebApi.Models {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public enum Status
@@ -67,17 +70,72 @@ namespace WebApi.Models {
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
         public ApplicationDbContext()
-            : base("ProductStore", throwIfV1Schema: false) {
+            : base("name=ProductStore", throwIfV1Schema: false) {
         }
-
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
         static ApplicationDbContext() {
             // Set the database intializer which is run once during application start
             // This seeds the database with admin user credentials and admin role
             Database.SetInitializer<ApplicationDbContext>(new ApplicationDbInitializer());
         }
-
         public static ApplicationDbContext Create() {
             return new ApplicationDbContext();
         }
     }
+    public class ApplicationDbInitializer : DropCreateDatabaseIfModelChanges<ApplicationDbContext>
+    {
+        protected override void Seed(ApplicationDbContext context)
+        {
+            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            var roleManager = HttpContext.Current.GetOwinContext().Get<ApplicationRoleManager>();
+            InitializeIdentityForEF(context,userManager,roleManager);
+            base.Seed(context);
+        }
+
+        //Create User=Admin@Admin.com with password=Admin@123456 in the Admin role        
+        public static void InitializeIdentityForEF(ApplicationDbContext db,ApplicationUserManager userManager,ApplicationRoleManager roleManager)
+        {
+    
+            const string name = "admin@example.com";
+            const string password = "123456";
+            const string roleName = "Admin";
+
+            //Create Role Admin if it does not exist
+            var role = roleManager.FindByName(roleName);
+            if (role == null)
+            {
+                role = new ApplicationRole(roleName);
+                var roleresult = roleManager.Create(role);
+            }
+
+            var user = userManager.FindByName(name);
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = name, Email = name, EmailConfirmed = true };
+                var result = userManager.Create(user, password);
+
+                result = userManager.SetLockoutEnabled(user.Id, false);
+            }
+
+            // Add user admin to Role Admin if not already added
+            var rolesForUser = userManager.GetRoles(user.Id);
+            if (!rolesForUser.Contains(role.Name))
+            {
+                var result = userManager.AddToRole(user.Id, role.Name);
+            }
+            var products = new List<Product>()
+            {
+                new Product() { Name = "Tomato Soup", Price = 1.39M, ActualCost = .99M ,Id=0},
+                new Product() { Name = "Hammer", Price = 16.99M, ActualCost = 10,Id=1 },
+                new Product() { Name = "Yo yo", Price = 6.99M, ActualCost = 2.05M ,Id=2}
+            };
+
+            products.ForEach(p => db.Products.AddOrUpdate(p));
+            db.SaveChanges();
+        }
+    }
+
 }

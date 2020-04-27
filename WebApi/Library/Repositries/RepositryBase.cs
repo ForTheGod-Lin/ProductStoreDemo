@@ -16,11 +16,11 @@ namespace WebApi.Repositries
             Context = context;
         }
         
-        public T Add(T model)
+        public bool Add(T model)
         {
             Context.Entry<T>(model).State = EntityState.Added;
-            Context.SaveChanges();
-            return model;
+           return Context.SaveChanges()>0;
+            
         }
 
         public bool Delete(T model)
@@ -37,7 +37,7 @@ namespace WebApi.Repositries
         }
 
         public IQueryable<T> FindList(Expression<Func<T, bool>> where)
-        {        
+        {
                 return Context.Set<T>().Where(where); 
         }
 

@@ -10,7 +10,7 @@ namespace WebApi.Services
     public interface IServiceBase<T> 
     {
         
-        T Add(T model);
+        bool Add(T model);
         bool Update(T model);
         bool Delete(T model);
          IQueryable<T> FindList(Expression<Func<T, bool>> where);

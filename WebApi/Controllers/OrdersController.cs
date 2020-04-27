@@ -11,7 +11,7 @@ namespace WebApi.Controllers
 {
     public class OrdersController : ApiController
     {
-        private ProductStore db = new ProductStore();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/Orders
         public IQueryable<Order> GetOrders()

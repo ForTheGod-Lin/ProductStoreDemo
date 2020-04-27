@@ -15,7 +15,7 @@ namespace WebApi.Services
         {
             Repositry = r;
         }
-        public T Add(T model)
+        public bool Add(T model)
         {
             return Repositry.Add(model);
         }

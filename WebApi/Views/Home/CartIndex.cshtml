@@ -3,7 +3,7 @@
     ViewBag.Title = "CartIndex";
 }
 
-<div id="cart" class="" data-bind="if:products">
+<div id="cart" class="" data-bind="if:products().length>0">
     <h1>购物车</h1>
     <table class="table table-striped table-hover">
         <thead>
@@ -50,10 +50,13 @@
     </table>
     <p>总额: <span data-bind="text:orderDetails().total()"></span></p>
 </div>
-<script>
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+    <script>
     function AppViewModel() {
         var self = this;
         self.products = ko.observableArray();
+        self.orderDetails = ko.observable();
         var url = "@Url.HttpRouteUrl("DefaultApi", new { controller = "Cart" })";
         function ProductViewModel(root, product, quantity) {
             var self = this;
@@ -84,24 +87,35 @@
         self.addOrder = function () {
             var orderDetails = new Array();
             $.each(self.products(), function (index, item) {
-                orderDetails.push({ ProductId: item.product.Id, Quantity: item.Quantity })
+                orderDetails.push({ ProductId: item.ProductId, Quantity: item.Quantity })
             });
             var order = { Details: orderDetails };
-
-
             $.ajax({
                 type: "Delete",
-                url: url,
-                data: { userId:@Model.Id},
-                success: function () {
-                    self.products.removeAll();
-                    self.orderDetails(new OrderDetailsViewModel(order));
+                url: url+"?userId="+"@Model.Id",
+                success: function (data) {
+                    $.ajax({
+                        type: "Get",
+                        url: "/api/Orders/"+data,
+                        success: function (data) {
+                            self.products.removeAll();
+                            self.orderDetails(new OrderDetailsViewModel(data));
+                        }
+                    });
                 }
             });
         };
-        $.each(@Model.CartItems, function (index, item) {
-            self.products.push(new ProductViewModel(self, item.Product, item.Quantity));
+        $.ajax({
+            type: "Get",
+            url: url +"?id="+"@Model.Id",
+            success: function (data) {
+                $.each(data, function (index, item) {
+                    self.products.push(new ProductViewModel(self, item.Product, item.Quantity));
+                });
+            }
         });
+
     }
     ko.applyBindings(new AppViewModel());
-</script>
+    </script>
+}

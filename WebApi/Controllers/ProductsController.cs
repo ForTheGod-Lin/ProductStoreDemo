@@ -10,17 +10,18 @@ namespace WebApi.Controllers
 {
     public class ProductsController : ApiController
     {
-        private ProductStore context = new ProductStore();
+        private ApplicationDbContext context = new ApplicationDbContext();
         public IEnumerable<ProductDTO> GetProducts()
         {
            
 
-            return context.Products.OrderBy(p=>p.Id).Select(p => new ProductDTO()
+            var a= context.Products.OrderBy(p=>p.Id).Select(p => new ProductDTO()
             {
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price
-            });
+            }).ToList();
+            return a;
         }
         public ProductDTO GetProduct(int id)
         {

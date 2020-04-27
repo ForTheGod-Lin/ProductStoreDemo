@@ -7,16 +7,16 @@ using Microsoft.AspNet.Identity.Owin;
 
 namespace WebApi.Repositries
 {
-    public class ProductRepositry:RepositryBase<Product,ProductStore>,IProductRepositry
+    public class ProductRepositry:RepositryBase<Product,ApplicationDbContext>,IProductRepositry
     {
-        public ProductRepositry() : base(HttpContext.Current.GetOwinContext().Get<ProductStore>()) { }
+        public ProductRepositry() : base(HttpContext.Current.GetOwinContext().Get<ApplicationDbContext>()) { }
     }
-    public class OrderRepositry : RepositryBase<Order, ProductStore>,IOrderRepositry
+    public class OrderRepositry : RepositryBase<Order, ApplicationDbContext>,IOrderRepositry
     {
-        public OrderRepositry() : base(HttpContext.Current.GetOwinContext().Get<ProductStore>()) { }
+        public OrderRepositry() : base(HttpContext.Current.GetOwinContext().Get<ApplicationDbContext>()) { }
     }
-    public class CartItemRepositry : RepositryBase<CartItem, ProductStore>,ICartItemRepositry
+    public class CartItemRepositry : RepositryBase<CartItem, ApplicationDbContext>,ICartItemRepositry
     {
-        public CartItemRepositry():base(HttpContext.Current.GetOwinContext().Get<ProductStore>()) { }
+        public CartItemRepositry():base(HttpContext.Current.GetOwinContext().Get<ApplicationDbContext>()) { }
     }
 }

@@ -253,6 +253,11 @@
     <Compile Include="Library\Services\IServices.cs" />
     <Compile Include="Library\Services\ServiceBase.cs" />
     <Compile Include="Library\Services\Services.cs" />
+    <Compile Include="Migrations\202004270538400_Identity.cs" />
+    <Compile Include="Migrations\202004270538400_Identity.Designer.cs">
+      <DependentUpon>202004270538400_Identity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -1368,6 +1373,11 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202004270538400_Identity.resx">
+      <DependentUpon>202004270538400_Identity.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -15,7 +15,7 @@ namespace WebApi.Controllers
   
     public class AdminController : ApiController
     {
-        private ProductStore db = new ProductStore();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/Products
         public object GetProducts(int page=1,int rows=10)

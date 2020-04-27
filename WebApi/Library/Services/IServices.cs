@@ -9,6 +9,8 @@ namespace WebApi.Services
     public interface IOrderService : IServiceBase<Order> { }
     public interface ICartItemService : IServiceBase<CartItem> {
         bool Delete(int id);
-       bool DeleteAllToOrder(string userId);
+       int DeleteAllToOrder(string userId);
+        IEnumerable<CartItem> Get(string id);
+        bool AddCartItemByName(CartItem item);
     }
 }
