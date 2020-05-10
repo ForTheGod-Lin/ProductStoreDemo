@@ -1,0 +1,16 @@
+﻿@model IEnumerable<WebApi.Models.Menu>
+@{
+    Layout = null;
+}
+
+<div id="aa" class="easyui-accordion" style="">
+    @foreach (var menu in Model)
+    {
+    <div title="@menu.Title" data-options="iconCls:'icon-edit',selected:true" style="overflow:auto;padding:10px;">
+        @foreach (var item in menu.Items)
+        {
+            <p><a href="@item.Href" class="ml">@item.Text</a></p>
+        }
+    </div>
+    }
+</div>

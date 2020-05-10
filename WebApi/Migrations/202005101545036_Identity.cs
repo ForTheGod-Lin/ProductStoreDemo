@@ -140,10 +140,37 @@ namespace WebApi.Migrations
                 .PrimaryKey(t => t.Id)
                 .Index(t => t.Name, unique: true, name: "RoleNameIndex");
             
+            CreateTable(
+                "dbo.Menus",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Title = c.String(),
+                        ApplicationRole_Id = c.String(maxLength: 128),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.AspNetRoles", t => t.ApplicationRole_Id)
+                .Index(t => t.ApplicationRole_Id);
+            
+            CreateTable(
+                "dbo.MenuItems",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Text = c.String(),
+                        Href = c.String(),
+                        MenuId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Menus", t => t.MenuId, cascadeDelete: true)
+                .Index(t => t.MenuId);
+            
         }
         
         public override void Down()
         {
+            DropForeignKey("dbo.Menus", "ApplicationRole_Id", "dbo.AspNetRoles");
+            DropForeignKey("dbo.MenuItems", "MenuId", "dbo.Menus");
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.OrderDetails", "ApplicationUser_Id", "dbo.AspNetUsers");
@@ -154,6 +181,8 @@ namespace WebApi.Migrations
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.CartItems", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.CartItems", "ProductId", "dbo.Products");
+            DropIndex("dbo.MenuItems", new[] { "MenuId" });
+            DropIndex("dbo.Menus", new[] { "ApplicationRole_Id" });
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
@@ -166,6 +195,8 @@ namespace WebApi.Migrations
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
             DropIndex("dbo.CartItems", new[] { "ProductId" });
             DropIndex("dbo.CartItems", new[] { "UserId" });
+            DropTable("dbo.MenuItems");
+            DropTable("dbo.Menus");
             DropTable("dbo.AspNetRoles");
             DropTable("dbo.AspNetUserRoles");
             DropTable("dbo.Orders");

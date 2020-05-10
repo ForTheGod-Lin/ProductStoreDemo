@@ -10,7 +10,6 @@ namespace WebApi.Repositries
 {
     public interface IRepositryBase<T,TContext> where T:class where TContext : DbContext
     {
-        TContext Context { get; set; }
         IQueryable<T> FindList(Expression<Func<T,bool>> where);
         IQueryable<T> FindPagedList<S>(Expression<Func<T, bool>> where, Expression<Func<T, S>> order, bool isAsc, int page, int size);
         T Find(Expression<Func<T, bool>> where);

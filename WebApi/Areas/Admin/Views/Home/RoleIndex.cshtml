@@ -1,0 +1,124 @@
+﻿@model WebApi.Models.ApplicationRole
+
+
+
+
+
+<table id="dg" title="角色列表" class="easyui-datagrid" style="width:100%;height:100%" ;margin:0;
+       url="@Url.HttpRouteUrl("DefaultApi", new { controller = "Role" })"
+       method="Get"
+       toolbar="#toolbar" pagination="true"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+        <tr>
+            <th field="Id" width="100">主键</th>
+            <th field="Name" width="100">角色名</th>
+        </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">添加</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
+</div>
+
+<div id="dlg" class="easyui-dialog fe" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
+    <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
+        <h3>角色信息</h3>
+        <div style="margin-bottom:10px">
+
+            @Html.TextBoxFor(model => model.Name, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.Name), style = "width:100%" })
+
+        </div>
+
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a id="save" href="javascript:void(0)" class="easyui-linkbutton " iconCls="icon-ok" style="width:90px">确定</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="$('#dlg').dialog('close')" style="width:90px">取消</a>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        var url="@Url.HttpRouteUrl("DefaultApi",new { Controller="Role"})"+"/";
+        function newUser() {
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle', '添加角色');
+            $('#fm').form('clear');
+            $("#save").click(postSave);
+        }
+        function editUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑角色');
+                $.get(url, { id: row.Id }, function (data) {
+                    $('#fm').form('load', data);
+                });
+                $("#save").click(function () {
+                    putSave(row);
+                });
+            }
+        }
+
+        function postSave() {
+            if (!$("#fm").form("validate")) return false;
+            var data = $("#fm").serialize();
+            $.ajax({
+                url: url,
+                type: "Post",
+                data: data,
+                success: function (result) {
+                    $('#dlg').dialog('close');
+                    $('#dg').datagrid('reload');
+                }
+            }).fail(function (jqxhr) {
+                var result = jqxhr.responseJSON
+                $.messager.show({
+                    title: 'Error',
+                    msg: result.Message
+                });
+            });
+        }
+        function putSave(row) {
+            if (!$("#fm").form("validate")) return false;
+            var data = $("#fm").serialize();
+            $.ajax({
+                url: url + row.Id,
+                type: "Put",
+                data: data,
+                success: function (result) {
+                    $('#dlg').dialog('close');
+                    $('#dg').datagrid('reload');
+                }
+            }).fail(function (jqxhr) {
+                var result = jqxhr.responseJSON
+                $.messager.show({
+                    title: 'Error',
+                    msg: result.Message
+                });
+            });
+        }
+
+
+        function destroyUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $.messager.confirm('确认', '你确定要删除该角色？', function (r) {
+                    if (r) {
+                        $.ajax({
+                            url: url + row.Id,
+                            type: "Delete",
+                            success: function (data) {
+                                $('#dg').datagrid('reload');
+                            }
+                        }).fail(function (jqxhr) {
+                            var result = jqxhr.responseJSON
+                            $.messager.show({
+                                title: 'Error',
+                                msg: result.Message
+                            });
+                        })
+                    }
+                });
+            }
+        }
+    </script>
+}

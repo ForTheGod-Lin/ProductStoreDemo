@@ -61,11 +61,26 @@ namespace WebApi.Models {
             return userIdentity;
         }
     }
+    public class Menu
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public virtual ICollection<MenuItem> Items { get; set; }
+    }
+    public class MenuItem
+    {
+        public int Id { get; set; }
+        public string Text { get; set; }
+        public string Href { get; set; }
+        public int MenuId { get; set; }
+        public virtual Menu Menu { get; set; }
+    }
     public class ApplicationRole : IdentityRole
     {
         public ApplicationRole() : base() { }
 
         public ApplicationRole(string name) : base(name) { }
+        public virtual ICollection<Menu> Menus { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
@@ -107,14 +122,32 @@ namespace WebApi.Models {
             var role = roleManager.FindByName(roleName);
             if (role == null)
             {
-                role = new ApplicationRole(roleName);
+                role = new ApplicationRole(roleName) {
+                    Menus = new[]{
+                        new Menu(){
+                    Title="后台用户系统管理",
+                    Items=new[]{
+                        new MenuItem() {Href="/Admin/Home/UserIndex" ,Text="用户管理"},
+                    new MenuItem(){ Href="/Admin/Home/RoleIndex",Text="角色管理"}}
+                          },
+                        new Menu()
+                        {
+                        Title="后台产品系统管理",
+                        Items=new[]{ new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理"} } } }
+                };
                 var roleresult = roleManager.Create(role);
             }
 
             var user = userManager.FindByName(name);
             if (user == null)
             {
-                user = new ApplicationUser { UserName = name, Email = name, EmailConfirmed = true };
+
+                user = new ApplicationUser
+                {
+                    UserName = name,
+                    Email = name,
+                    EmailConfirmed = true,
+                };
                 var result = userManager.Create(user, password);
 
                 result = userManager.SetLockoutEnabled(user.Id, false);

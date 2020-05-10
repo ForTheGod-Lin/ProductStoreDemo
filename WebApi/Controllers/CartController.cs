@@ -6,22 +6,23 @@ using System.Net.Http;
 using System.Web.Http;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.Owin;
-using WebApi.Services;
+using WebApi.Repositries;
 namespace WebApi.Controllers
 {
     public class CartController : ApiController
     {
-        private ICartItemService context = new CartItemService();
+        public ICartItemRepositry Context = new CartItemRepositry();
+    
         // GET: api/Cart
      public IEnumerable<CartItem> Get(string id)
         {
-            return context.Get(id);
+            return Context.Get(id);
         }
 
         // POST: api/Cart
         public void Post([FromBody]CartItem model)
         {
-            context.AddCartItemByName(model);
+            Context.AddCartItemByName(model);
         }
 
         // PUT: api/Cart/5
@@ -32,12 +33,12 @@ namespace WebApi.Controllers
         // DELETE: api/Cart/5
         public HttpResponseMessage Delete(int id)
         {
-            if (context.Delete(id)) return Request.CreateResponse(HttpStatusCode.NoContent);
+            if (Context.Delete(id)) return Request.CreateResponse(HttpStatusCode.NoContent);
             else throw new HttpRequestException();
         }
         public int DeleteAll(string userId)
         {
-            return context.DeleteAllToOrder(userId);
+            return Context.DeleteAllToOrder(userId);
         }
     }
 }

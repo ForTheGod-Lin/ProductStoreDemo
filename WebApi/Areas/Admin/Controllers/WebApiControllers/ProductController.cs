@@ -13,7 +13,7 @@ using WebApi.Models;
 namespace WebApi.Controllers
 {
   
-    public class AdminController : ApiController
+    public class ProductController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         public object GetProducts(int page=1,int rows=10)
         {
            var model= db.Products;
-            return new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip(page - 1).Take(rows) };
+            return new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip((page - 1)*rows).Take(rows) };
 
         }
 
@@ -46,11 +46,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
+            product.Id = id;
             db.Entry(product).State = EntityState.Modified;
 
             try

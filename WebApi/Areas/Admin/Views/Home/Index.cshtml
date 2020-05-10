@@ -17,33 +17,51 @@
         <div style="float:right">当前时间 @DateTime.Now.ToString()</div>
     </div>
     <div data-options="region:'west',split:true" title="菜单导航" style="width:180px;padding:10px;">
-        <div id="aa" class="easyui-accordion" style="">
-            <div title="后台用户系统管理" data-options="iconCls:'icon-edit',selected:true" style="overflow:auto;padding:10px;">
-                <p><a href="javascript:void(0)" onclick="userView()">用户管理</a></p>
-                <p><a href="javascript:void(0)" onclick="roleView()">角色管理</a></p>
-            </div>
-            <div title="后台产品系统管理" data-options="iconCls:'icon-edit'" style="padding:10px;">
-                <p><a href="javascript:void(0)" onclick="productView()">产品管理</a></p>
-            </div>
-        </div>
+     @Html.Action("Menu")
     </div>
     <div data-options="region:'east',split:true,title:'日历信息'" style="width:240px;padding:10px;">
         <div id="cc" class="easyui-calendar" style="width:180px;height:180px;"></div>
     </div>
-    <div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
+    <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
         版权所有：L 
     </div>
     <div id="center" data-options="region:'center'" title="网站首页〉用户管理〉用户列表">
-  @Html.Action("Index","UserAdmin")
+        <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
+ 
     </div>
 
     @Scripts.Render("~/bundles/EasyUI")
     <script>
         $(function () {
-          
+            $(".ml").click(function (event) {
+                event.preventDefault();
+                var src = $(this).attr("href");
+                var title = $(this).text();
+                var str = '<iframe id="frmWorkArea" width="100%" height="100%" frameborder="0" scrolling="yes" src="' + src + '"></iframe>';
+                var isExist = $("#tab").tabs('exists', title);
+                if (!isExist) {
+                    $("#tab").tabs('add', {
+
+                        title: title,
+
+                        content: str,
+
+                        iconCls: 'icon-save',
+
+                        closable: true
+
+                    });
+                }
+                else {
+                    $("#tab").tabs('select', title);
+
+                }
+            });
         })
+
         function userView() {
-            $.get("/Admin/UserAdmin/Index", null, function (data) {
+            $.get("/Admin/Home/UserIndex", null, function (data) {
+                $("#dlg").dialog("destroy");
                 $("#center").html(data);
                 var temp = $('body').layout('panel', 'center');
                 temp.panel('setTitle', '网站首页〉用户管理〉用户列表');
@@ -51,7 +69,8 @@
             });
         }
         function roleView() {
-            $.get("/Admin/RoleAdmin/Index", null, function (data) {
+            $.get("/Admin/Home/RoleIndex", null, function (data) {
+                $("#dlg").dialog("destroy");
                 $("#center").html(data);
                 var temp = $('body').layout('panel', 'center');
                 temp.panel('setTitle', '网站首页〉角色管理〉角色列表');
@@ -59,7 +78,8 @@
             });
         }
         function productView() {
-            $.get("/Admin/ProductAdmin/Index", null, function (data) {
+            $.get("/Admin/Home/ProductIndex", null, function (data) {
+                $("#dlg").dialog("destroy");
                 $("#center").html(data);
                 var temp = $('body').layout('panel', 'center');
                 temp.panel('setTitle', '网站首页〉产品管理〉产品列表');

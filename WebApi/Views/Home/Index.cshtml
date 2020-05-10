@@ -108,10 +108,12 @@
                         <div class="">
                             <div data-bind="text: Name"></div>
                             <span class="text-success" data-bind="text: '$' + Price"></span>
-                            <input type="text" data-bind="value:$parent.Quantity" class="form-control form-control-sm d-inline" />
                         </div>
-                        <button class="btn btn-sm btn-primary " data-bind="click:$parent.add">Add</button>
-
+                        <div class="btn-group">
+                            <button id="reduce" type="button" class="btn btn-default">-</button>
+                            <input id="count" type="text" disabled class="btn btn-default" value="1" data-bind="value:$parent.Quantity">
+                            <button id="add" type="button" class="btn btn-default" data-bind="click:$parent.add">+</button>
+                        </div>
                         <button class="btn btn-success btn-block" data-bind="click: $parent.addToCart">添加到购物车</button>
 
                     </div>
