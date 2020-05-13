@@ -56,4 +56,8 @@ namespace WebApi.Repositries
             else return Add(item);
         }
     }
+    public class MenuGroupRepositry : RepositryBase<MenuGroup, ApplicationDbContext>, IMenuGroupRepositry
+    {
+        public MenuGroupRepositry() : base(new ApplicationDbContext()) { }
+    }
 }

@@ -13,4 +13,5 @@ namespace WebApi.Repositries
         IEnumerable<CartItem> Get(string id);
         bool AddCartItemByName(CartItem item);
     }
+    public interface IMenuGroupRepositry : IRepositryBase<MenuGroup, ApplicationDbContext> { }
 }

@@ -236,6 +236,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Library\Common\ValidateCode.cs" />
+    <Compile Include="Library\Repositries\CommonContext.cs" />
     <Compile Include="Library\Repositries\IRepositries.cs" />
     <Compile Include="Library\Repositries\IRepositryBase.cs" />
     <Compile Include="Library\Repositries\Repositries.cs" />
@@ -1207,6 +1208,8 @@
     <Content Include="Areas\Admin\Views\Home\RoleIndex.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ProductIndex.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Menu.cshtml" />
+    <Content Include="libman.json" />
+    <Content Include="Areas\Admin\Views\Home\MenuGroup.cshtml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />

@@ -10,26 +10,28 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net;
 using System.Net.Http;
+using WebApi.Repositries;
 namespace WebApi.Areas.Admin.Controllers
 {
     public class RoleController : ApiController
     {
-      
-   
-        public ApplicationRoleManager RoleManager
+
+        public RoleController()
         {
-            get { return Request.GetOwinContext().Get<ApplicationRoleManager>(); }
+            Context = new CommonContext(Request.GetOwinContext());
         }
+        public CommonContext Context { get; set; }
+       
         // GET: Admin/roleAdmin
         public object GetAll(int page = 1, int rows = 10)
         {
-            var model = RoleManager.Roles;
+            var model = Context.RoleManager.Roles;
             return new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip((page - 1) * rows).Take(rows) };
         }
      
         public object Get(string id)
         {
-            var role =  RoleManager.FindById(id);
+            var role =  Context.RoleManager.FindById(id);
             if (role != null)
             {
                
@@ -41,7 +43,7 @@ namespace WebApi.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result =  RoleManager.Create(role);
+                var result =  Context.RoleManager.Create(role);
                 if (result.Succeeded)
                 {
                     var response = Request.CreateResponse(HttpStatusCode.Created, role);
@@ -56,13 +58,13 @@ namespace WebApi.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var roleInfo = RoleManager.FindById(id);
+                var roleInfo = Context.RoleManager.FindById(id);
                 if (roleInfo != null)
                 {
                     roleInfo.Name = role.Name;
                 }
                 else throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "未找到此用户"));
-                var result =  RoleManager.Update(roleInfo);
+                var result =  Context.RoleManager.Update(roleInfo);
                 if (result.Succeeded) return;
                 else ModelState.AddModelError("", result.Errors.First());
             }
@@ -71,13 +73,21 @@ namespace WebApi.Areas.Admin.Controllers
         }
         public void Delete(string id)
         {
-            var role =  RoleManager.FindById(id);
+            var role =  Context.RoleManager.FindById(id);
             if (role != null)
             {
-                 RoleManager.Delete(role);
+                 Context.RoleManager.Delete(role);
                 return ;
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Context.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

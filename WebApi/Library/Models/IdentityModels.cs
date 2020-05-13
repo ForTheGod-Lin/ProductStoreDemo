@@ -61,10 +61,26 @@ namespace WebApi.Models {
             return userIdentity;
         }
     }
+    public class RoleMenuGroup
+    {
+        [Key,Column(Order=0)]
+        public int MenuGroupId { get; set; }
+        [Key, Column(Order = 1)]
+        public int ApplicationId { get; set; }
+    }
+    public class MenuGroup
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public virtual ICollection<Menu> Menus { get; set; }
+        public virtual ICollection<RoleMenuGroup> RoleMenus { get; set; }
+    }
     public class Menu
     {
         public int Id { get; set; }
         public string Title { get; set; }
+        public int MenuGroupId { get; set; }
         public virtual ICollection<MenuItem> Items { get; set; }
     }
     public class MenuItem
@@ -81,6 +97,7 @@ namespace WebApi.Models {
 
         public ApplicationRole(string name) : base(name) { }
         public virtual ICollection<Menu> Menus { get; set; }
+        public virtual ICollection<RoleMenuGroup> RoleMenus { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {

@@ -11,32 +11,30 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.AspNet.Identity;
 using System.IO;
+using WebApi.Repositries;
 namespace WebApi.Controllers
 {
     public class UserController : ApiController
     {
-      
-        public ApplicationRoleManager RoleManager
+        public UserController()
         {
+            Context = new CommonContext(Request.GetOwinContext());
+        }
+        public CommonContext Context { get; set; }
 
-            get { return Request.GetOwinContext().Get<ApplicationRoleManager>();}
-        }
-        public ApplicationUserManager UserManager
-        {
-            get { return Request.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
-        }
+       
         public object GetAll(int page=1,int rows = 10)
         {
-            var model = UserManager.Users;
+            var model = Context.UserManager.Users;
             return new { total = model.Count(), rows = model.OrderBy(u => u.Id).Skip((page - 1) * rows).Take(rows) };
         }
         public object Get(string id)
         {
-            var user =UserManager.FindByIdAsync(id).Result;
+            var user = Context.UserManager.FindByIdAsync(id).Result;
             if (user != null)
             {
-                var userRoles =  UserManager.GetRolesAsync(user.Id).Result;
-                var Roles = RoleManager.Roles.Select(r => new
+                var userRoles = Context.UserManager.GetRolesAsync(user.Id).Result;
+                var Roles = Context.RoleManager.Roles.Select(r => new
                 {
                     Selected = userRoles.Contains(r.Name),
                     Name = r.Name
@@ -49,7 +47,7 @@ namespace WebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result =  UserManager.Create(user);
+                var result = Context.UserManager.Create(user);
                 if (result.Succeeded)
                 {
                     Stream stream =  Request.Content.ReadAsStreamAsync().Result;
@@ -58,7 +56,7 @@ namespace WebApi.Controllers
                    
                     if (Roles != null)
                     {
-                        var result1 = UserManager.AddToRoles(user.Id, Roles);
+                        var result1 = Context.UserManager.AddToRoles(user.Id, Roles);
                         if (!result.Succeeded)
                         {
                             ModelState.AddModelError("", result1.Errors.First());
@@ -76,7 +74,7 @@ namespace WebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userInfo = UserManager.FindById(id);
+                var userInfo = Context.UserManager.FindById(id);
                 if (userInfo != null)
                 {
                     userInfo.UserName = user.UserName;
@@ -85,13 +83,13 @@ namespace WebApi.Controllers
                     userInfo.PhoneNumber = user.PhoneNumber;
                     userInfo.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
                     userInfo.Status = user.Status;
-                    var userRoles = UserManager.GetRoles(id);
+                    var userRoles = Context.UserManager.GetRoles(id);
                     Stream stream = Request.Content.ReadAsStreamAsync().Result;
                     stream.Seek(0, SeekOrigin.Begin);
                     string[] Roles = Request.Content.ReadAsFormDataAsync().Result.GetValues("RoleNames");
                     Roles = Roles ?? new string[] { };
 
-                    var result1 = UserManager.AddToRoles(id, Roles.Except(userRoles).ToArray());
+                    var result1 = Context.UserManager.AddToRoles(id, Roles.Except(userRoles).ToArray());
 
                     if (!result1.Succeeded)
                     {
@@ -99,7 +97,7 @@ namespace WebApi.Controllers
                     }
                     else
                     {
-                        result1 = UserManager.RemoveFromRoles(id, userRoles.Except(Roles).ToArray());
+                        result1 = Context.UserManager.RemoveFromRoles(id, userRoles.Except(Roles).ToArray());
 
                         if (!result1.Succeeded)
                         {
@@ -107,7 +105,7 @@ namespace WebApi.Controllers
                         }
                         else
                         {
-                           result1 = UserManager.Update(userInfo);
+                           result1 = Context.UserManager.Update(userInfo);
                             if (result1.Succeeded) return;
                             else ModelState.AddModelError("", result1.Errors.First());
                         }
@@ -121,14 +119,22 @@ namespace WebApi.Controllers
         }
         public void Delete(string id)
         {
-            var user =  UserManager.FindById(id);
+            var user = Context.UserManager.FindById(id);
             if (user != null)
             {
                 if (User.Identity.Name == user.UserName) throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "不能删除自己"));
-                 UserManager.Delete(user);
+                Context.UserManager.Delete(user);
                 return ;
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Context.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
