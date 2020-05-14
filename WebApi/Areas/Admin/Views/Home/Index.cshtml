@@ -16,11 +16,9 @@
        @Html.Action("MenuGroup")
     </div>
     <div data-options="region:'west',split:true" title="菜单导航" style="width:180px;padding:10px;">
-     @Html.Action("Menu")
-    </div>
-    <div data-options="region:'east',split:true,title:'日历信息'" style="width:240px;padding:10px;">
-        <div id="cc" class="easyui-calendar" style="width:180px;height:180px;"></div>
-    </div>
+       
+        </div>
+   
     <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
         版权所有：L 
     </div>
@@ -36,13 +34,12 @@
                 event.preventDefault();
                 var src = $(this).attr("href");
                 var title = $(this).text();
-       
+
                 var isExist = $("#tab").tabs('exists', title);
                 if (!isExist) {
                     $("#tab").tabs('add', {
-
                         title: title,
-                       href: stc,
+                        href: stc,
                         iconCls: 'icon-save',
                         closable: true
                     });
@@ -53,7 +50,9 @@
                 }
             });
         })
+        function createDialog() {
 
+        }
         function userView() {
             $.get("/Admin/Home/UserIndex", null, function (data) {
                 $("#dlg").dialog("destroy");

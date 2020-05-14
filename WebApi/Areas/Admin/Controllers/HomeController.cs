@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
-using WebApi.Repositries;
 namespace WebApi.Areas.Admin.Controllers
 {
     public class HomeController : Controller
@@ -36,15 +35,9 @@ namespace WebApi.Areas.Admin.Controllers
             }
             return View(menuGroups);
         }
-        public ActionResult Menu()
+        public ActionResult Menu(int id)
         {
-            var user = HttpContext.GetOwinContext().Get<ApplicationUserManager>().FindByName(User.Identity.Name);
-            var list = user.Roles.Select(r => Context.RoleManager.FindById(r.RoleId));
-            var menus = new List<Menu>();
-          foreach(var r in list)
-            {
-                menus.AddRange(r.Menus);
-            }
+            var menus = Context.MenuRepositry.FindList(m => m.Id == id);
             return View(menus);
         }
         public ActionResult UserIndex()
@@ -52,11 +45,23 @@ namespace WebApi.Areas.Admin.Controllers
             ViewBag.RoleNames = HttpContext.GetOwinContext().Get<ApplicationRoleManager>().Roles.Select(r => r.Name);
             return View();
         }
+        public ActionResult UserDialog()
+        {
+            return View();
+        }
         public ActionResult RoleIndex()
         {
             return View();
         }
+        public ActionResult RoleDialog()
+        {
+            return View();
+        }
         public ActionResult ProductIndex()
+        {
+            return View();
+        }
+        public ActionResult ProductDialog()
         {
             return View();
         }

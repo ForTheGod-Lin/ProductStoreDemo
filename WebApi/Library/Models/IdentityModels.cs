@@ -66,7 +66,7 @@ namespace WebApi.Models {
         [Key,Column(Order=0)]
         public int MenuGroupId { get; set; }
         [Key, Column(Order = 1)]
-        public int ApplicationId { get; set; }
+        public string ApplicationRoleId { get; set; }
     }
     public class MenuGroup
     {
@@ -108,6 +108,8 @@ namespace WebApi.Models {
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<MenuGroup> MenuGroups { get; set; }
+        public DbSet<RoleMenuGroup> RoleMenuGroups { get; set; }
         static ApplicationDbContext() {
             // Set the database intializer which is run once during application start
             // This seeds the database with admin user credentials and admin role
@@ -134,13 +136,18 @@ namespace WebApi.Models {
             const string name = "admin@example.com";
             const string password = "123456";
             const string roleName = "Admin";
+            var Context = new CommonContext();
 
-            //Create Role Admin if it does not exist
             var role = roleManager.FindByName(roleName);
             if (role == null)
             {
-                role = new ApplicationRole(roleName) {
-                    Menus = new[]{
+                role = new ApplicationRole(roleName);
+                var roleresult = roleManager.Create(role);
+            }
+            var mg = new MenuGroup()
+            {
+                Name = "基础管理",
+                Menus = new[]{
                         new Menu(){
                     Title="后台用户系统管理",
                     Items=new[]{
@@ -150,15 +157,14 @@ namespace WebApi.Models {
                         new Menu()
                         {
                         Title="后台产品系统管理",
-                        Items=new[]{ new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理"} } } }
-                };
-                var roleresult = roleManager.Create(role);
-            }
-
+                        Items=new[]{ new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理"} } } },
+            };
+            Context.MenuGroupRepositry.Add(mg);
+            var roleMg = new RoleMenuGroup() { ApplicationRoleId=role.Id,MenuGroupId=mg.Id};
+            Context.RoleMenuGroupRepositry.Add(roleMg);
             var user = userManager.FindByName(name);
             if (user == null)
             {
-
                 user = new ApplicationUser
                 {
                     UserName = name,

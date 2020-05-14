@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using WebApi.Models;
-namespace WebApi.Repositries
+namespace WebApi.Models
 {
     public class RepositryBase<T,TContext> : IRepositryBase<T,TContext> where T: class where TContext:DbContext
     {
@@ -57,5 +57,7 @@ namespace WebApi.Repositries
         {
             return Context.Set<T>().Any(any);
         }
+
+  
     }
 }

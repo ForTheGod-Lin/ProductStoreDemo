@@ -23,9 +23,9 @@
     </thead>
 </table>
 <div id="toolbar">
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">添加</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="userHandler.newUser()">添加</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="userHandler.editUser()">编辑</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="userHandler.destroyUser()">删除</a>
 </div>
 
 <div id="dlg" class="easyui-dialog fe" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
@@ -78,13 +78,14 @@
 </div>
 @section scripts{
 <script type="text/javascript">
-        var url="@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})"+"/";
-    function newUser() {
+    var userHandler = {};
+        userHandler.url="@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})"+"/";
+    userHandler.newUser=function() {
             $('#dlg').dialog('open').dialog('center').dialog('setTitle', '添加用户');
             $('#fm').form('clear');
             $("#save").click(postSave);
         }
-        function editUser() {
+    userHandler.editUser = function () {
             var row = $('#dg').datagrid('getSelected');
             if (row) {
                 $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑用户');
@@ -100,7 +101,7 @@
                 });
             }
         }
-        function postSave() {
+    userHandler.postSave = function () {
             if (!$("#fm").form("validate")) return false;
             var data = $("#fm").serialize();
             $.ajax({
@@ -119,7 +120,7 @@
                 });
             });
         }
-        function putSave(row) {
+    userHandler.putSave = function (row) {
             if (!$("#fm").form("validate")) return false;
             var data = $("#fm").serialize();
             $.ajax({
@@ -139,7 +140,7 @@
             });
         }
 
-        function destroyUser() {
+    userHandler.destroyUser = function (row) {
             var row = $('#dg').datagrid('getSelected');
             if (row) {
                 $.messager.confirm('确认', '你确定要删除该用户？', function (r) {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using WebApi.Models;
-namespace WebApi.Repositries
+
+namespace WebApi.Models
 {
     public  interface IProductRepositry:IRepositryBase<Product, ApplicationDbContext> {}
     public interface IOrderRepositry : IRepositryBase<Order, ApplicationDbContext> { }
@@ -14,4 +14,6 @@ namespace WebApi.Repositries
         bool AddCartItemByName(CartItem item);
     }
     public interface IMenuGroupRepositry : IRepositryBase<MenuGroup, ApplicationDbContext> { }
+    public interface IMenuRepositry : IRepositryBase<Menu, ApplicationDbContext> { }
+    public interface IRoleMenuGroupRepositry : IRepositryBase<RoleMenuGroup, ApplicationDbContext> { }
 }

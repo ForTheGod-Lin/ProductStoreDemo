@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net;
 using System.Net.Http;
-using WebApi.Repositries;
 namespace WebApi.Areas.Admin.Controllers
 {
     public class RoleController : ApiController

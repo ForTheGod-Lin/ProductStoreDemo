@@ -4,20 +4,23 @@ using System.Linq;
 using System.Web;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.Owin;
-
-namespace WebApi.Repositries
+using Microsoft.Owin;
+namespace WebApi.Models
 {
     public class ProductRepositry:RepositryBase<Product,ApplicationDbContext>,IProductRepositry
     {
+        public ProductRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
         public ProductRepositry() : base(new ApplicationDbContext()) { }
     }
     public class OrderRepositry : RepositryBase<Order, ApplicationDbContext>,IOrderRepositry
     {
+        public OrderRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
         public OrderRepositry() : base(new ApplicationDbContext()) { }
     }
     public class CartItemRepositry : RepositryBase<CartItem, ApplicationDbContext>,ICartItemRepositry
     {
-        public CartItemRepositry():base(new ApplicationDbContext()) { }
+        public CartItemRepositry(IOwinContext context) :base(context.Get<ApplicationDbContext>()) { }
+        public CartItemRepositry() : base(new ApplicationDbContext()) { }
         public bool Delete(int id)
         {
             return Delete(Find(i => i.Id == id));
@@ -59,5 +62,17 @@ namespace WebApi.Repositries
     public class MenuGroupRepositry : RepositryBase<MenuGroup, ApplicationDbContext>, IMenuGroupRepositry
     {
         public MenuGroupRepositry() : base(new ApplicationDbContext()) { }
+        public MenuGroupRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
+    }
+    public class MenuRepositry : RepositryBase<Menu, ApplicationDbContext>, IMenuRepositry
+    {
+        public MenuRepositry() : base(new ApplicationDbContext()) { }
+        public MenuRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
+    }
+    public class RoleMenuGroupRepositry :  RepositryBase<RoleMenuGroup, ApplicationDbContext>, IRoleMenuGroupRepositry
+    {
+        public RoleMenuGroupRepositry():base(new ApplicationDbContext()){}
+        public RoleMenuGroupRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
+
     }
 }

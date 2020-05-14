@@ -1,13 +1,15 @@
 ﻿@model IEnumerable<WebApi.Models.MenuGroup>
-
 @{
     Layout = null;
 }
-<ul>
+<div style="float:right">
     @foreach(var mg in Model)
     {
-        <li>
-            <a>@mg.Name<span></span></a>
-        </li>
+            <a onclick="initMenuGroup(@mg.Id)" href="##">@mg.Name<span></span></a>
     }
-</ul>
+</div>
+<script>
+    function initMenuGroup(id) {
+        $("#nav").load("" + id);
+    }
+</script>

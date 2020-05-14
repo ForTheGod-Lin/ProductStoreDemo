@@ -11,7 +11,6 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.AspNet.Identity;
 using System.IO;
-using WebApi.Repositries;
 namespace WebApi.Controllers
 {
     public class UserController : ApiController

@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Web.Http;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.Owin;
-using WebApi.Repositries;
 namespace WebApi.Controllers
 {
     public class CartController : ApiController

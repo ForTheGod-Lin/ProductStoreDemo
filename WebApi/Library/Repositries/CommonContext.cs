@@ -2,24 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using WebApi.Repositries;
 using WebApi.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Microsoft.AspNet.Identity.Owin;
-namespace WebApi.Repositries
+namespace WebApi.Models
 {
     public class CommonContext:IDisposable
     {
         public CommonContext(IOwinContext context)
         {
 
-            ProductRepositry=context.Get<ProductRepositry>();
-            OrderRepositry = context.Get<OrderRepositry>();
-            CartItemRepositry = context.Get<CartItemRepositry>();
-            MenuGroupRepositry = context.Get<MenuGroupRepositry>();
+            ProductRepositry = new ProductRepositry(context);
+            OrderRepositry = new OrderRepositry(context);
+            CartItemRepositry =new CartItemRepositry(context);
+            MenuGroupRepositry =new  MenuGroupRepositry(context);
             UserManager = context.GetUserManager<ApplicationUserManager>();
             RoleManager = context.Get<ApplicationRoleManager>();
+            MenuRepositry = new MenuRepositry(context);
+            RoleMenuGroupRepositry = new RoleMenuGroupRepositry(context);
+        }
+        public CommonContext()
+        {
+
+            ProductRepositry = new ProductRepositry();
+            OrderRepositry = new OrderRepositry();
+            CartItemRepositry = new CartItemRepositry();
+            MenuGroupRepositry = new MenuGroupRepositry();
+            UserManager = new ApplicationUserManager(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+            RoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole>(new ApplicationDbContext()));
+            MenuRepositry = new MenuRepositry();
+            RoleMenuGroupRepositry = new RoleMenuGroupRepositry();
+        }
+        public static CommonContext Create(IdentityFactoryOptions<CommonContext> options,
+            IOwinContext context)
+        {
+            return new CommonContext(context);
         }
         public IProductRepositry ProductRepositry;
         public IOrderRepositry OrderRepositry;
@@ -27,7 +45,8 @@ namespace WebApi.Repositries
         public IMenuGroupRepositry MenuGroupRepositry;
         public ApplicationUserManager UserManager;
         public ApplicationRoleManager RoleManager;
-
+        public IMenuRepositry MenuRepositry;
+        public IRoleMenuGroupRepositry RoleMenuGroupRepositry;
         #region IDisposable Support
         private bool disposedValue = false; // 要检测冗余调用
 

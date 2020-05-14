@@ -3,14 +3,36 @@
     Layout = null;
 }
 
-<div id="aa" class="easyui-accordion" style="">
+<div id="nav" class="easyui-accordion" style="">
     @foreach (var menu in Model)
     {
     <div title="@menu.Title" data-options="iconCls:'icon-edit',selected:true" style="overflow:auto;padding:10px;">
         @foreach (var item in menu.Items)
         {
-            <p><a href="@item.Href" class="ml">@item.Text</a></p>
+            <p><a href="@item.Href" class="ml" onclick="initMenu()">@item.Text</a></p>
         }
     </div>
     }
 </div>
+<script>
+    function initMenu() {
+        var src = $(this).attr("href");
+        var title = $(this).text();
+
+        var isExist = $("#tab").tabs('exists', title);
+        if (!isExist) {
+            $("#tab").tabs('add', {
+                title: title,
+                href: stc,
+                iconCls: 'icon-save',
+                closable: true
+            });
+        }
+        else {
+            $("#tab").tabs('select', title);
+
+        }
+  
+    return false;
+    }
+</script>
