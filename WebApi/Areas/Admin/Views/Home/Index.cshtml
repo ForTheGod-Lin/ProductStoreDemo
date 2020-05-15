@@ -15,71 +15,50 @@
     <div data-options="region:'north',border:false" title="后台管理系统" style="height:130px;background:#B3DFDA;padding:10px;text-align:center">
        @Html.Action("MenuGroup")
     </div>
-    <div data-options="region:'west',split:true" title="菜单导航" style="width:180px;padding:10px;">
-       
+    <div id="nav" data-options="region:'west',split:true" title="菜单导航" style="width:180px;">
         </div>
-   
-    <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
-        版权所有：L 
-    </div>
-    <div id="center" data-options="region:'center'" title="网站首页〉用户管理〉用户列表">
-        <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
- 
-    </div>
 
-    @Scripts.Render("~/bundles/EasyUI")
-    <script>
-        $(function () {
-            $(".ml").click(function (event) {
-                event.preventDefault();
-                var src = $(this).attr("href");
-                var title = $(this).text();
+        <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
+            版权所有：L
+        </div>
+        <div id="center" data-options="region:'center'">
+            <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
 
-                var isExist = $("#tab").tabs('exists', title);
-                if (!isExist) {
-                    $("#tab").tabs('add', {
-                        title: title,
-                        href: stc,
-                        iconCls: 'icon-save',
-                        closable: true
-                    });
-                }
-                else {
-                    $("#tab").tabs('select', title);
+        </div>
 
-                }
-            });
-        })
-        function createDialog() {
-
-        }
-        function userView() {
-            $.get("/Admin/Home/UserIndex", null, function (data) {
-                $("#dlg").dialog("destroy");
-                $("#center").html(data);
-                var temp = $('body').layout('panel', 'center');
-                temp.panel('setTitle', '网站首页〉用户管理〉用户列表');
-                $.parser.parse($("#center"));
-            });
-        }
-        function roleView() {
-            $.get("/Admin/Home/RoleIndex", null, function (data) {
-                $("#dlg").dialog("destroy");
-                $("#center").html(data);
-                var temp = $('body').layout('panel', 'center');
-                temp.panel('setTitle', '网站首页〉角色管理〉角色列表');
-                $.parser.parse($("#center"));
-            });
-        }
-        function productView() {
-            $.get("/Admin/Home/ProductIndex", null, function (data) {
-                $("#dlg").dialog("destroy");
-                $("#center").html(data);
-                var temp = $('body').layout('panel', 'center');
-                temp.panel('setTitle', '网站首页〉产品管理〉产品列表');
-                $.parser.parse($("#center"));
-            });
-        }
-    </script>
+        @Scripts.Render("~/bundles/EasyUI")
+        <script>
+            $()
+            function createDialog() {
+                $("<div>").attr({
+                    class: "easyui-dialog",
+                    id: "dialogcontent"
+                })
+            }
+            function userView() {
+                $.get("/Admin/Home/UserIndex", null, function (data) {
+                    $("#dlg").dialog("destroy");
+                    $("#center").html(data);
+              
+                    $.parser.parse($("#center"));
+                });
+            }
+            function roleView() {
+                $.get("/Admin/Home/RoleIndex", null, function (data) {
+                    $("#dlg").dialog("destroy");
+                    $("#center").html(data);
+                
+                    $.parser.parse($("#center"));
+                });
+            }
+            function productView() {
+                $.get("/Admin/Home/ProductIndex", null, function (data) {
+                    $("#dlg").dialog("destroy");
+                    $("#center").html(data);
+              
+                    $.parser.parse($("#center"));
+                });
+            }
+        </script>
 </body>
 </html>

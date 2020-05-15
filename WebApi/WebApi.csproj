@@ -248,9 +248,13 @@
     <Compile Include="Library\Models\ViewModels\OrderDTO.cs" />
     <Compile Include="Library\Models\ViewModels\ProductDTO.cs" />
     <Compile Include="Library\Models\ProductStore.cs" />
-    <Compile Include="Migrations\202005140253298_Identity.cs" />
-    <Compile Include="Migrations\202005140253298_Identity.Designer.cs">
-      <DependentUpon>202005140253298_Identity.cs</DependentUpon>
+    <Compile Include="Migrations\202005150107507_Identity.cs" />
+    <Compile Include="Migrations\202005150107507_Identity.Designer.cs">
+      <DependentUpon>202005150107507_Identity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202005150121526_p.cs" />
+    <Compile Include="Migrations\202005150121526_p.Designer.cs">
+      <DependentUpon>202005150121526_p.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1211,6 +1215,7 @@
     <Content Include="libman.json" />
     <Content Include="Areas\Admin\Views\Home\MenuGroup.cshtml" />
     <Content Include="Areas\Admin\Views\Home\UserDialog.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Text.cshtml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -1362,8 +1367,11 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202005140253298_Identity.resx">
-      <DependentUpon>202005140253298_Identity.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202005150107507_Identity.resx">
+      <DependentUpon>202005150107507_Identity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005150121526_p.resx">
+      <DependentUpon>202005150121526_p.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

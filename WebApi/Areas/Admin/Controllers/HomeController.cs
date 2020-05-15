@@ -10,10 +10,13 @@ namespace WebApi.Areas.Admin.Controllers
 {
     public class HomeController : Controller
     {
-      
+      public ActionResult Text()
+        {
+            return View();
+        }
       public HomeController()
         {
-            Context = new CommonContext(HttpContext.GetOwinContext());
+            Context = new CommonContext(System.Web.HttpContext.Current.GetOwinContext());
         }
         public CommonContext Context { get; set; }
         [Authorize]
@@ -24,11 +27,11 @@ namespace WebApi.Areas.Admin.Controllers
         public ActionResult MenuGroup()
         {
             var menuGroups = new List<MenuGroup>();
-            foreach(var menus in Context.UserManager.FindByName(User.Identity.Name).Roles.Select(r=> Context.RoleManager.FindById(r.RoleId).Menus))
+            foreach(var menus in Context.UserManager.FindByName(User.Identity.Name).Roles.Select(r=> Context.RoleManager.FindById(r.RoleId).RoleMenus))
             {
                 foreach(var m in menus)
                 {
-                    var mgr = Context.MenuGroupRepositry.Find(mg => mg.Id == m.Id);
+                    var mgr = Context.MenuGroupRepositry.Find(mg => mg.Id == m.MenuGroupId);
                     mgr.Menus = null;
                     menuGroups.Add(mgr);
                 }

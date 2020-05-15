@@ -96,7 +96,6 @@ namespace WebApi.Models {
         public ApplicationRole() : base() { }
 
         public ApplicationRole(string name) : base(name) { }
-        public virtual ICollection<Menu> Menus { get; set; }
         public virtual ICollection<RoleMenuGroup> RoleMenus { get; set; }
     }
 
@@ -143,11 +142,10 @@ namespace WebApi.Models {
             {
                 role = new ApplicationRole(roleName);
                 var roleresult = roleManager.Create(role);
-            }
-            var mg = new MenuGroup()
-            {
-                Name = "基础管理",
-                Menus = new[]{
+                var mg = new MenuGroup()
+                {
+                    Name = "基础管理",
+                    Menus = new[]{
                         new Menu(){
                     Title="后台用户系统管理",
                     Items=new[]{
@@ -158,10 +156,12 @@ namespace WebApi.Models {
                         {
                         Title="后台产品系统管理",
                         Items=new[]{ new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理"} } } },
-            };
-            Context.MenuGroupRepositry.Add(mg);
-            var roleMg = new RoleMenuGroup() { ApplicationRoleId=role.Id,MenuGroupId=mg.Id};
-            Context.RoleMenuGroupRepositry.Add(roleMg);
+                };
+                Context.MenuGroupRepositry.Add(mg);
+                var roleMg = new RoleMenuGroup() { ApplicationRoleId = role.Id, MenuGroupId = mg.Id };
+                Context.RoleMenuGroupRepositry.Add(roleMg);
+            }
+          
             var user = userManager.FindByName(name);
             if (user == null)
             {

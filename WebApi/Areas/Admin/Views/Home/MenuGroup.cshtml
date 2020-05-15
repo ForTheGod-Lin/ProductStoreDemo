@@ -10,6 +10,11 @@
 </div>
 <script>
     function initMenuGroup(id) {
-        $("#nav").load("" + id);
+        $("#nav").load("@Url.Action("Menu")" + "/" + id, function () {
+            $.parser.parse($("#nav"));
+        });
+
+     
+       
     }
 </script>
