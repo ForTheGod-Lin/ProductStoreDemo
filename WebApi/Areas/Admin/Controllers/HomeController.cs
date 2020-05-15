@@ -14,11 +14,17 @@ namespace WebApi.Areas.Admin.Controllers
         {
             return View();
         }
-      public HomeController()
+    
+        private CommonContext _context;
+        public CommonContext Context
         {
-            Context = new CommonContext(System.Web.HttpContext.Current.GetOwinContext());
+            get
+            {
+                if (_context == null) _context = new CommonContext(Request.GetOwinContext());
+                return _context;
+            }
         }
-        public CommonContext Context { get; set; }
+   
         [Authorize]
         public ActionResult Index()
         {
@@ -48,9 +54,30 @@ namespace WebApi.Areas.Admin.Controllers
             ViewBag.RoleNames = HttpContext.GetOwinContext().Get<ApplicationRoleManager>().Roles.Select(r => r.Name);
             return View();
         }
-        public ActionResult UserDialog()
+        public ActionResult UserDialog(string id)
         {
-            return View();
+            if (id != null)
+            {
+                var user = Context.UserManager.FindByIdAsync(id).Result;
+                    var userRoles = Context.UserManager.GetRoles(id);
+                    var selectedRoles = Context.RoleManager.Roles.Select(r => new
+                    {
+                        Selected = userRoles.Contains(r.Name),
+                        r.Name
+                    });
+                    ViewBag.selectedRoles = selectedRoles;
+                    return View(user);
+            }
+            else
+            {
+                var selectedRoles = Context.RoleManager.Roles.Select(r => new SelectListItem
+                {
+                    Selected = false,
+                    Text=r.Name
+                });
+                ViewBag.selectedRoles = selectedRoles;
+                return View();
+            }
         }
         public ActionResult RoleIndex()
         {

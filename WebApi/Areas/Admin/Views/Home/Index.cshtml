@@ -12,52 +12,26 @@
  
 </head>
 <body class="easyui-layout">
-    <div data-options="region:'north',border:false" title="后台管理系统" style="height:130px;background:#B3DFDA;padding:10px;text-align:center">
+    <div data-options="region:'north',border:false" title="后台管理系统" style="height:130px;background:#B3DFDA;">
        @Html.Action("MenuGroup")
     </div>
-    <div id="nav" data-options="region:'west',split:true" title="菜单导航" style="width:180px;">
-        </div>
-
-        <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;text-align:center;">
+    <div id="nav" data-options="region:'west',split:true" title="菜单导航" style="width:180px;"> </div>
+     <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;text-align:center;">
             版权所有：L
         </div>
-        <div id="center" data-options="region:'center'">
-            <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
-
-        </div>
+     <div id="center" data-options="region:'center'">
+         <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
+     </div>
 
         @Scripts.Render("~/bundles/EasyUI")
         <script>
-            $()
+            $(function () {
+
+            })
             function createDialog() {
                 $("<div>").attr({
-                    class: "easyui-dialog",
-                    id: "dialogcontent"
-                })
-            }
-            function userView() {
-                $.get("/Admin/Home/UserIndex", null, function (data) {
-                    $("#dlg").dialog("destroy");
-                    $("#center").html(data);
-              
-                    $.parser.parse($("#center"));
-                });
-            }
-            function roleView() {
-                $.get("/Admin/Home/RoleIndex", null, function (data) {
-                    $("#dlg").dialog("destroy");
-                    $("#center").html(data);
-                
-                    $.parser.parse($("#center"));
-                });
-            }
-            function productView() {
-                $.get("/Admin/Home/ProductIndex", null, function (data) {
-                    $("#dlg").dialog("destroy");
-                    $("#center").html(data);
-              
-                    $.parser.parse($("#center"));
-                });
+                    id: "dialog"
+                }).prependTo($("body"));
             }
         </script>
 </body>

@@ -6,10 +6,10 @@
 
 
 
-<table id="dg"  class="easyui-datagrid" style="width:100%;height:100%" ;margin:0;
+<table id="userGrid"  class="easyui-datagrid" fit="true"
        url="@Url.HttpRouteUrl("DefaultApi", new { controller = "User" })"
        method="Get"
-       toolbar="#toolbar" pagination="true"
+       toolbar="#userToolbar" pagination="true"
        rownumbers="true" fitColumns="true" singleSelect="true">
     <thead>
         <tr>
@@ -24,95 +24,66 @@
         </tr>
     </thead>
 </table>
-<div id="toolbar">
+<div id="userToolbar">
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="userHandler.newUser()">添加</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="userHandler.editUser()">编辑</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="userHandler.destroyUser()">删除</a>
 </div>
 
-<div id="dlg" class="easyui-dialog fe" style="width:400px" data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
-    <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
-        <h3>用户信息</h3>
-        <div style="margin-bottom:10px">
-
-            @Html.TextBoxFor(model => model.UserName, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.UserName), style = "width:100%" })
-
-        </div>
-        <div style="margin-bottom:10px">
-
-            @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.PhoneNumber), style = "width:100%" })
-
-        </div>
-
-        <div style="margin-bottom:10px">
-
-            @Html.TextBox(Html.NameFor(model => model.PhoneNumberConfirmed).ToString(), "true", new { @class = "easyui-checkbox", label = Html.DisplayNameFor(model => model.PhoneNumberConfirmed) })
-
-        </div>
-        <div style="margin-bottom:10px">
-
-            @Html.TextBoxFor(model => model.Email, new { @class = "easyui-textbox", required = "true", validType = "email", label = Html.DisplayNameFor(m => m.Email), style = "width:100%" })
-
-        </div>
-        <div style="margin-bottom:10px">
-
-            @Html.TextBox(Html.NameFor(model => model.EmailConfirmed).ToString(), "true", new { @class = "easyui-checkbox", label = Html.DisplayNameFor(model => model.EmailConfirmed) })
-
-        </div>
-        <div style="margin-bottom:10px">
-
-            @Html.DropDownListFor(model => model.Status, new SelectList(Enum.GetNames(typeof(WebApi.Models.Status)), Enum.GetNames(typeof(WebApi.Models.Status))[0]), new { @class = "easyui-combobox", required = "true", label = Html.DisplayNameFor(m => m.Status), style = "width:100%" })
-
-        </div>
-        <div style="margin-bottom:10px">
-            @foreach (var name in (IEnumerable<string>)ViewBag.RoleNames)
-            {
-                <input type="checkbox" name="RoleNames" value="@name" />
-                @Html.Label(name)
-            }
-
-        </div>
-    </form>
-</div>
-<div id="dlg-buttons">
-    <a id="save" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" style="width:90px">确定</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="$('#dlg').dialog('close')" style="width:90px">取消</a>
-</div>
 
 <script type="text/javascript">
     var userHandler = {};
-        userHandler.url="@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})"+"/";
-    userHandler.newUser=function() {
-            $('#dlg').dialog('open').dialog('center').dialog('setTitle', '添加用户');
-            $('#fm').form('clear');
-            $("#save").click(postSave);
-        }
+    userHandler.apiUrl = "@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})" + "/";
+    userHandler.url="@Url.Action("UserDialog")"+"/";
+    userHandler.newUser = function () {
+        createDialog();
+        $('#dialog').dialog({
+            iconCls: 'icon-save',
+            width: 400,
+            modal: true,
+            href: userHandler.url,
+            buttons: [{
+                text: '添加',
+                iconCls:"icon-ok",
+                handler: userHandler.postSave
+            },
+                {
+                    text: '关闭',
+                    iconCls:"icon-cancel",
+                    handler: function () { $('#dialog').dialog("destroy"); }
+                }]
+        }).dialog('open').dialog('center').dialog('setTitle', '添加用户');
+    };
     userHandler.editUser = function () {
-            var row = $('#dg').datagrid('getSelected');
-            if (row) {
-                $('#dlg').dialog('open').dialog('center').dialog('setTitle', '编辑用户');
-                $.get(url, { id: row.Id }, function (data) {
-                    $('#fm').form('load', data.User);
-                    $('#status').val(data.User.StatusString);
-                    $.each(data.Roles, function (index, item) {
-                        $("[value=" + item.Name + "]").prop("checked", item.Selected == true);
-                    });
-                });
-                $("#save").click(function () {
-                    putSave(row);
-                });
-            }
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $('#dialog').dialog({
+                iconCls: 'icon-save',
+                width: 400,
+                modal: true,
+                href: userHandler.url + row.id,
+                buttons: [{
+                    text: '添加',
+                    iconCls:"icon-ok",
+                    handler: function () { putSave(row); }
+                }, {
+                    text: '关闭',
+                    iconCls:"icon-cancel",
+                    handler: function () { $('#dialog').dialog("destroy"); }
+                }]
+            }).dialog('open').dialog('center').dialog('setTitle', '编辑用户');
         }
+    }
     userHandler.postSave = function () {
-            if (!$("#fm").form("validate")) return false;
-            var data = $("#fm").serialize();
+            if (!$("#userFm").form("validate")) return false;
+            var data = $("#userFm").serialize();
             $.ajax({
-                url:url,
+                url:userHandler.apiUrl,
                 type: "Post",
                 data: data,
                 success: function (result) {
-                    $('#dlg').dialog('close');
-                    $('#dg').datagrid('reload');
+                    $('#dialog').dialog('destroy');
+                    $('#userGrid').datagrid('reload');
                 }
             }).fail(function (jqxhr) {
                 var result = jqxhr.responseJSON
@@ -126,7 +97,7 @@
             if (!$("#fm").form("validate")) return false;
             var data = $("#fm").serialize();
             $.ajax({
-                url: url + row.Id,
+                url: userHandler.apiUrl + row.Id,
                 type: "Put",
                 data: data,
                 success: function (result) {
@@ -143,15 +114,15 @@
         }
 
     userHandler.destroyUser = function (row) {
-            var row = $('#dg').datagrid('getSelected');
+            var row = $('#userGrid').datagrid('getSelected');
             if (row) {
                 $.messager.confirm('确认', '你确定要删除该用户？', function (r) {
                     if (r) {
                         $.ajax({
-                            url: url + row.Id,
+                            url: userHandler.apiUrl+ row.Id,
                             type: "Delete",
                             success: function (data) {
-                                $('#dg').datagrid('reload');
+                                $('#userGrid').datagrid('reload');
                             }
                         }).fail(function (jqxhr) {
                             var result = jqxhr.responseJSON

@@ -15,12 +15,16 @@ namespace WebApi.Areas.Admin.Controllers
     public class RoleController : ApiController
     {
 
-        public RoleController()
+        private CommonContext _context;
+        public CommonContext Context
         {
-            Context = new CommonContext(Request.GetOwinContext());
+            get
+            {
+                if (_context == null) _context = new CommonContext(Request.GetOwinContext());
+                return _context;
+            }
         }
-        public CommonContext Context { get; set; }
-       
+
         // GET: Admin/roleAdmin
         public object GetAll(int page = 1, int rows = 10)
         {

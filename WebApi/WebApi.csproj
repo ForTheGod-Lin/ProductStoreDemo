@@ -248,13 +248,9 @@
     <Compile Include="Library\Models\ViewModels\OrderDTO.cs" />
     <Compile Include="Library\Models\ViewModels\ProductDTO.cs" />
     <Compile Include="Library\Models\ProductStore.cs" />
-    <Compile Include="Migrations\202005150107507_Identity.cs" />
-    <Compile Include="Migrations\202005150107507_Identity.Designer.cs">
-      <DependentUpon>202005150107507_Identity.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202005150121526_p.cs" />
-    <Compile Include="Migrations\202005150121526_p.Designer.cs">
-      <DependentUpon>202005150121526_p.cs</DependentUpon>
+    <Compile Include="Migrations\202005151353377_Identity.cs" />
+    <Compile Include="Migrations\202005151353377_Identity.Designer.cs">
+      <DependentUpon>202005151353377_Identity.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1367,11 +1363,8 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202005150107507_Identity.resx">
-      <DependentUpon>202005150107507_Identity.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202005150121526_p.resx">
-      <DependentUpon>202005150121526_p.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202005151353377_Identity.resx">
+      <DependentUpon>202005151353377_Identity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

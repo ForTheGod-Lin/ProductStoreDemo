@@ -5,12 +5,12 @@
 <div  class="easyui-accordion" fit="true" border="false">
     @foreach (var menu in Model)
     {
-        <div title="@menu.Title"  style="padding-left:10px">
+        <ul title="@menu.Title"  style="padding:10px">
             @foreach (var item in menu.Items)
             {
-                <p><a href="@item.Href" onclick="return initMenu(this)" style="">@item.Text</a></p>
+            <li  style="padding-bottom:10px"><a href="@item.Href" onclick="return initMenu(this)" style=""><sapn class="icon-edit" ></sapn>@item.Text</a></li>
             }
-        </div>
+        </ul>
     }
 </div>
 <script>
@@ -24,7 +24,6 @@
     function initMenu(that) {
         var src = $(that).attr("href");
         var title = $(that).text();
-
         var isExist = $("#tab").tabs('exists', title);
         if (!isExist) {
             $("#tab").tabs('add', {

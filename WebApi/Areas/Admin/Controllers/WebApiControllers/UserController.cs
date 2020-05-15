@@ -15,11 +15,12 @@ namespace WebApi.Controllers
 {
     public class UserController : ApiController
     {
-        public UserController()
-        {
-            Context = new CommonContext(Request.GetOwinContext());
-        }
-        public CommonContext Context { get; set; }
+    
+        private CommonContext _context;
+        public CommonContext Context { get {
+                if(_context==null)_context = new CommonContext(Request.GetOwinContext());
+                return _context;
+            } }
 
        
         public object GetAll(int page=1,int rows = 10)
@@ -36,9 +37,9 @@ namespace WebApi.Controllers
                 var Roles = Context.RoleManager.Roles.Select(r => new
                 {
                     Selected = userRoles.Contains(r.Name),
-                    Name = r.Name
+                    r.Name
                 });
-                return new { User=user,Roles=Roles};
+                return new { User=user,Roles};
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
