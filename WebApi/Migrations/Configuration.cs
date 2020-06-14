@@ -15,10 +15,8 @@ namespace WebApi.Migrations
 
         protected override void Seed(WebApi.Models.ApplicationDbContext context)
         {
-            var userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-            var roleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole>(new ApplicationDbContext()));
             //  This method will be called after migrating to the latest version.
-            ApplicationDbInitializer.InitializeIdentityForEF(context,userManager,roleManager);
+            ApplicationDbInitializer.InitializeIdentityForEF(context,new CommonContext());
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
         }

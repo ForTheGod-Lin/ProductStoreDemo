@@ -1,0 +1,76 @@
+﻿
+@{
+    Layout = null;
+    var i = 0;
+}
+@model IEnumerable<WebApi.Models.ApplicationRole>
+
+<table id="menu_dis"style="border:1px;">
+
+    @foreach(var r in Model)
+    {
+        <tr>
+            <td>@(++i)</td>
+            <td>@r.Name</td>
+            <td><button name="@r.Name" onclick="ps.menuHandler.bindclick(this)">分配权限</button></td>
+        </tr>
+    }
+</table>
+<script>
+    (function ($, ps) {
+        var menuHandler = {};
+        ps.menuHandler = menuHandler;
+        var url = "@Url.Action("GetMenuTree")" + "?roleName=";
+        var apiUrl = "@Url.Action("SaveMenu")"+"?roleName=";
+        var name;
+        menuHandler.bindclick = function (that) {
+             name = $(that).prop("name");
+            ps.createDialog();
+            $('#dialog').dialog({
+                iconCls: 'icon-save',
+                width: 400,
+                modal: true,
+                content: '<ul id="tt"></ul>',
+                onClose: function () {
+                    $('#dialog').dialog("destroy");
+                },
+                buttons: [{
+                    text: '确定',
+                    iconCls: "icon-ok",
+                    handler: menuHandler.postSave
+                },
+                {
+                    text: '关闭',
+                    iconCls: "icon-cancel",
+                    handler: function () { $('#dialog').dialog("destroy"); }
+                }]
+            }).dialog('open').dialog('center').dialog('setTitle', '分配权限');
+            $('#tt').tree({
+                url: url + name,
+                method: 'get',
+                animate: true,
+                checkbox: true
+            });
+        }
+        menuHandler.postSave = function () {
+            var nodes = $('#tt').tree('getChecked', ['checked', 'indeterminate']);
+            for (var i = 0; i < nodes.length; i++) {
+                $.extend(nodes[i], { children: null });
+            }
+            $.ajax({
+                url: apiUrl + name,
+                type: "Post",
+                data: { nodes: JSON.stringify(nodes) },
+                success: function (result) {
+                    $('#dialog').dialog('destroy');
+                }
+            }).fail(function (jqxhr) {
+                var result = jqxhr.responseJSON
+                $.messager.show({
+                    title: 'Error',
+                    msg: result.Message
+                });
+            });
+        }
+    }(jQuery, ps))
+</script>

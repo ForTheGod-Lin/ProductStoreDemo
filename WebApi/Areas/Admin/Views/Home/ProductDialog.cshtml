@@ -1,0 +1,17 @@
+﻿@model WebApi.Models.Product
+@{
+    Layout = null;
+}
+
+<form id="productFm" method="post" novalidate style="margin:0;padding:20px 50px">
+    <h3>产品信息</h3>
+    <div style="margin-bottom:10px">
+        @Html.TextBoxFor(model => model.Name, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.Name), style = "width:100%" })
+    </div>
+    <div style="margin-bottom:10px">
+        @Html.TextBoxFor(model => model.Price, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.Price), style = "width:100%" })
+    </div>
+    <div style="margin-bottom:10px">
+        @Html.TextBoxFor(model => model.ActualCost, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.ActualCost), style = "width:100%" })
+    </div>
+</form>

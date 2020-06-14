@@ -1,0 +1,11 @@
+﻿@model WebApi.Models.ApplicationRole
+@{
+    Layout = null;
+}
+
+<form id="roleFm" method="post" novalidate style="margin:0;padding:20px 50px">
+    <h3>角色信息</h3>
+    <div style="margin-bottom:10px">
+        @Html.TextBoxFor(model => model.Name, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.Name), style = "width:100%" })
+    </div>
+</form>

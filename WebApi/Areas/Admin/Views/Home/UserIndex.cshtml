@@ -25,60 +25,69 @@
     </thead>
 </table>
 <div id="userToolbar">
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="userHandler.newUser()">添加</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="userHandler.editUser()">编辑</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="userHandler.destroyUser()">删除</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="ps.userHandler.newUser()">添加</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="ps.userHandler.editUser()">编辑</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="ps.userHandler.destroyUser()">删除</a>
 </div>
 
 
 <script type="text/javascript">
-    var userHandler = {};
-    userHandler.apiUrl = "@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})" + "/";
-    userHandler.url="@Url.Action("UserDialog")"+"/";
-    userHandler.newUser = function () {
-        createDialog();
-        $('#dialog').dialog({
-            iconCls: 'icon-save',
-            width: 400,
-            modal: true,
-            href: userHandler.url,
-            buttons: [{
-                text: '添加',
-                iconCls:"icon-ok",
-                handler: userHandler.postSave
-            },
-                {
-                    text: '关闭',
-                    iconCls:"icon-cancel",
-                    handler: function () { $('#dialog').dialog("destroy"); }
-                }]
-        }).dialog('open').dialog('center').dialog('setTitle', '添加用户');
-    };
-    userHandler.editUser = function () {
-        var row = $('#dg').datagrid('getSelected');
-        if (row) {
+    (function($,ps) {
+        var userHandler = {};
+        ps.userHandler = userHandler;
+        userHandler.apiUrl = "@Url.HttpRouteUrl("DefaultApi",new { Controller="User"})" + "/";
+        userHandler.url = "@Url.Action("UserDialog")" + "/";
+        userHandler.newUser = function () {
+            ps.createDialog();
             $('#dialog').dialog({
                 iconCls: 'icon-save',
                 width: 400,
                 modal: true,
-                href: userHandler.url + row.id,
+                href: userHandler.url,
+                onClose: function () {
+                    $('#dialog').dialog("destroy");
+                },
                 buttons: [{
                     text: '添加',
-                    iconCls:"icon-ok",
-                    handler: function () { putSave(row); }
-                }, {
+                    iconCls: "icon-ok",
+                    handler: userHandler.postSave
+                },
+                {
                     text: '关闭',
-                    iconCls:"icon-cancel",
+                    iconCls: "icon-cancel",
                     handler: function () { $('#dialog').dialog("destroy"); }
                 }]
-            }).dialog('open').dialog('center').dialog('setTitle', '编辑用户');
+            }).dialog('open').dialog('center').dialog('setTitle', '添加用户');
+        };
+        userHandler.editUser = function () {
+            var row = $('#userGrid').datagrid('getSelected');
+            if (row) {
+                ps.createDialog();
+                $('#dialog').dialog({
+                    iconCls: 'icon-save',
+                    width: 400,
+                    modal: true,
+                    href: userHandler.url + row.Id,
+                    onClose: function () {
+                        $('#dialog').dialog("destroy");
+                    },
+                    buttons: [{
+                        text: '添加',
+                        iconCls: "icon-ok",
+                        handler: function () { putSave(row); }
+                    }, {
+                        text: '关闭',
+                        iconCls: "icon-cancel",
+                        handler: function () { $('#dialog').dialog("destroy"); }
+                    }]
+                }).dialog('open').dialog('center').dialog('setTitle', '编辑用户');
+            }
         }
-    }
-    userHandler.postSave = function () {
+        userHandler.postSave = function () {
             if (!$("#userFm").form("validate")) return false;
             var data = $("#userFm").serialize();
             $.ajax({
-                url:userHandler.apiUrl,
+                url: userHandler.apiUrl,
                 type: "Post",
                 data: data,
                 success: function (result) {
@@ -93,7 +102,7 @@
                 });
             });
         }
-    userHandler.putSave = function (row) {
+        userHandler.putSave = function (row) {
             if (!$("#fm").form("validate")) return false;
             var data = $("#fm").serialize();
             $.ajax({
@@ -102,7 +111,7 @@
                 data: data,
                 success: function (result) {
                     $('#dlg').dialog('close');
-                    $('#dg').datagrid('reload');
+                    $('#userGrid').datagrid('reload');
                 }
             }).fail(function (jqxhr) {
                 var result = jqxhr.responseJSON
@@ -113,13 +122,13 @@
             });
         }
 
-    userHandler.destroyUser = function (row) {
+        userHandler.destroyUser = function (row) {
             var row = $('#userGrid').datagrid('getSelected');
             if (row) {
                 $.messager.confirm('确认', '你确定要删除该用户？', function (r) {
                     if (r) {
                         $.ajax({
-                            url: userHandler.apiUrl+ row.Id,
+                            url: userHandler.apiUrl + row.Id,
                             type: "Delete",
                             success: function (data) {
                                 $('#userGrid').datagrid('reload');
@@ -135,4 +144,5 @@
                 });
             }
         }
+    } )(jQuery, ps);
 </script>

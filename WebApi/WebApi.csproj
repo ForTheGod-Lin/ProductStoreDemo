@@ -93,12 +93,6 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
-    </Reference>
-    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -197,7 +191,6 @@
     <Compile Include="Areas\Admin\Controllers\WebApiControllers\RoleController.cs" />
     <Compile Include="Areas\Admin\Controllers\WebApiControllers\UserController.cs" />
     <Compile Include="Areas\Admin\Controllers\WebApiControllers\ProductController.cs" />
-    <Compile Include="Areas\Admin\Models\PostViewModel.cs" />
     <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
     <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
     <Compile Include="Areas\HelpPage\Controllers\HelpController.cs" />
@@ -248,9 +241,9 @@
     <Compile Include="Library\Models\ViewModels\OrderDTO.cs" />
     <Compile Include="Library\Models\ViewModels\ProductDTO.cs" />
     <Compile Include="Library\Models\ProductStore.cs" />
-    <Compile Include="Migrations\202005151353377_Identity.cs" />
-    <Compile Include="Migrations\202005151353377_Identity.Designer.cs">
-      <DependentUpon>202005151353377_Identity.cs</DependentUpon>
+    <Compile Include="Migrations\202006131134087_P.cs" />
+    <Compile Include="Migrations\202006131134087_P.Designer.cs">
+      <DependentUpon>202006131134087_P.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1131,7 +1124,6 @@
     <Content Include="Content\jquery-easyui-1.7.0\themes\mobile.css" />
     <Content Include="Content\jquery-easyui-1.7.0\themes\react.css" />
     <Content Include="Content\jquery-easyui-1.7.0\themes\vue.css" />
-    <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -1207,11 +1199,12 @@
     <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Home\RoleIndex.cshtml" />
     <Content Include="Areas\Admin\Views\Home\ProductIndex.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Menu.cshtml" />
     <Content Include="libman.json" />
-    <Content Include="Areas\Admin\Views\Home\MenuGroup.cshtml" />
     <Content Include="Areas\Admin\Views\Home\UserDialog.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Text.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\MenuDistribution.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\RoleDialog.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\ProductDialog.cshtml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -1349,6 +1342,7 @@
     <Content Include="Views\Home\CartIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Admin\Views\Shared\EditorTemplates\" />
   </ItemGroup>
   <ItemGroup>
@@ -1363,8 +1357,8 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202005151353377_Identity.resx">
-      <DependentUpon>202005151353377_Identity.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202006131134087_P.resx">
+      <DependentUpon>202006131134087_P.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

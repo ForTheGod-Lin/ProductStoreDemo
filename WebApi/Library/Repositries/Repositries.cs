@@ -64,15 +64,4 @@ namespace WebApi.Models
         public MenuGroupRepositry() : base(new ApplicationDbContext()) { }
         public MenuGroupRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
     }
-    public class MenuRepositry : RepositryBase<Menu, ApplicationDbContext>, IMenuRepositry
-    {
-        public MenuRepositry() : base(new ApplicationDbContext()) { }
-        public MenuRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
-    }
-    public class RoleMenuGroupRepositry :  RepositryBase<RoleMenuGroup, ApplicationDbContext>, IRoleMenuGroupRepositry
-    {
-        public RoleMenuGroupRepositry():base(new ApplicationDbContext()){}
-        public RoleMenuGroupRepositry(IOwinContext context) : base(context.Get<ApplicationDbContext>()) { }
-
-    }
 }

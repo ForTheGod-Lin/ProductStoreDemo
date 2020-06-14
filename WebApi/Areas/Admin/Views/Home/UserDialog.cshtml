@@ -8,7 +8,7 @@
 
 }
 
-<form id="userFm" method="post">
+<form id="userFm" method="post" style="margin:0;padding:20px 50px">
     <h3>用户信息</h3>
     <div style="margin-bottom:10px">
         @Html.TextBoxFor(model => model.UserName, new { @class = "easyui-textbox", required = "true", label = Html.DisplayNameFor(m => m.UserName), style = "width:100%" })

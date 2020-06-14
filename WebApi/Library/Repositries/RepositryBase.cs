@@ -38,6 +38,7 @@ namespace WebApi.Models
 
         public IQueryable<T> FindList(Expression<Func<T, bool>> where)
         {
+            if (where == null) return Context.Set<T>();
                 return Context.Set<T>().Where(where); 
         }
 
@@ -52,7 +53,10 @@ namespace WebApi.Models
         {
             return Context.Set<T>().Where(where).FirstOrDefault();
         }
-
+        public T FindById(params object[] ids)
+        {
+            return Context.Set<T>().Find(ids);
+        }
         public bool Exist(Expression<Func<T, bool>> any)
         {
             return Context.Set<T>().Any(any);

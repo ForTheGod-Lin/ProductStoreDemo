@@ -23,7 +23,7 @@
                 <div class="form-group row">
                     @Html.LabelFor(m => m.Password, new { @class = "col-md-2 col-form-label" })
                     <div class="col-md-10">
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control" ,value= "123456" })
                         @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                     </div>
                 </div>

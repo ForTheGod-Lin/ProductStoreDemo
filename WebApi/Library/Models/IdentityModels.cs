@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Microsoft.AspNet.Identity.Owin;
 using System.Web;
 using System.Data.Entity.Migrations;
+using System.Linq;
 namespace WebApi.Models {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public enum Status
@@ -70,33 +71,65 @@ namespace WebApi.Models {
     }
     public class MenuGroup
     {
+        public MenuGroup()
+        {
+            Menus = new HashSet<Menu>();
+            Roles = new HashSet<RoleMenuGroup>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
         public virtual ICollection<Menu> Menus { get; set; }
-        public virtual ICollection<RoleMenuGroup> RoleMenus { get; set; }
+        public virtual ICollection<RoleMenuGroup> Roles { get; set; }
     }
     public class Menu
     {
+        public Menu()
+        {
+            MenuItems = new HashSet<MenuItem>();
+            Roles = new HashSet<ApplicationRole>();
+        }
         public int Id { get; set; }
         public string Title { get; set; }
+        public string Icon { get; set; }
         public int MenuGroupId { get; set; }
-        public virtual ICollection<MenuItem> Items { get; set; }
+        public string ApplicationRoleId { get; set; }
+      //  public virtual MenuGroup MenuGroup { get; set; }
+        public virtual ICollection<MenuItem> MenuItems { get; set; }
+        public virtual ICollection<ApplicationRole> Roles { get; set; }
+
     }
     public class MenuItem
     {
+        public MenuItem()
+        {
+            Roles = new HashSet<ApplicationRole>();
+        }
         public int Id { get; set; }
         public string Text { get; set; }
         public string Href { get; set; }
+        public string Icon { get; set; }
         public int MenuId { get; set; }
-        public virtual Menu Menu { get; set; }
+        public virtual ICollection<ApplicationRole> Roles { get; set; }
+    //    public virtual Menu Menu { get; set; }
     }
     public class ApplicationRole : IdentityRole
     {
-        public ApplicationRole() : base() { }
-
-        public ApplicationRole(string name) : base(name) { }
-        public virtual ICollection<RoleMenuGroup> RoleMenus { get; set; }
+        public ApplicationRole() : base()
+        {
+            Menus = new HashSet<Menu>();
+            MenuGroups = new HashSet<RoleMenuGroup>();
+            MenuItems = new HashSet<MenuItem>();
+        }
+        public ApplicationRole(string name) : base(name)
+        {
+            Menus = new HashSet<Menu>();
+            MenuGroups = new HashSet<RoleMenuGroup>();
+            MenuItems = new HashSet<MenuItem>();
+        }
+        public virtual ICollection<RoleMenuGroup> MenuGroups { get; set; }
+        public virtual ICollection<Menu> Menus { get; set; }
+        public virtual ICollection<MenuItem> MenuItems { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
@@ -122,44 +155,62 @@ namespace WebApi.Models {
     {
         protected override void Seed(ApplicationDbContext context)
         {
-            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            var roleManager = HttpContext.Current.GetOwinContext().Get<ApplicationRoleManager>();
-            InitializeIdentityForEF(context,userManager,roleManager);
+           
+            InitializeIdentityForEF(context,new CommonContext(HttpContext.Current.GetOwinContext()));
             base.Seed(context);
         }
 
         //Create User=Admin@Admin.com with password=Admin@123456 in the Admin role        
-        public static void InitializeIdentityForEF(ApplicationDbContext db,ApplicationUserManager userManager,ApplicationRoleManager roleManager)
+        public static void InitializeIdentityForEF(ApplicationDbContext db, CommonContext context)
         {
     
             const string name = "admin@example.com";
             const string password = "123456";
             const string roleName = "Admin";
-            var Context = new CommonContext();
-
+          
+            ApplicationUserManager userManager = context.UserManager;
+            ApplicationRoleManager roleManager = context.RoleManager;
             var role = roleManager.FindByName(roleName);
             if (role == null)
             {
                 role = new ApplicationRole(roleName);
-                var roleresult = roleManager.Create(role);
-                var mg = new MenuGroup()
+                List<MenuGroup> mgL = new List<MenuGroup>
                 {
-                    Name = "基础管理",
-                    Menus = new[]{
-                        new Menu(){
-                    Title="后台用户系统管理",
-                    Items=new[]{
-                        new MenuItem() {Href="/Admin/Home/UserIndex" ,Text="用户管理"},
-                    new MenuItem(){ Href="/Admin/Home/RoleIndex",Text="角色管理"}}
-                          },
-                        new Menu()
-                        {
-                        Title="后台产品系统管理",
-                        Items=new[]{ new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理"} } } },
+                    new MenuGroup()
+                    {
+                        Name = "基础管理",
+                        Menus = new[]{
+                    new Menu(){
+                    Title="后台用户系统管理" ,Icon="icon-save",MenuItems=new[]{
+                        new MenuItem() {Href="/Admin/Home/UserIndex" ,Text="用户管理",Icon="icon-save"},
+                         new MenuItem(){ Href="/Admin/Home/RoleIndex",Text="角色管理",Icon="icon-save"}}},
+                    new Menu(){Title="后台产品系统管理",Icon="icon-save",MenuItems=new[]{
+                        new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理",Icon="icon-save"}}}},
+                        Icon="icon-save"
+                    },
+                    new MenuGroup()
+                    {
+                        Name="菜单管理",
+                        Menus=new[]{new Menu() { Title = "角色权限管理", Icon = "icon-save", MenuItems = new[] {new MenuItem() { Href= "/Admin/Home/MenuDistribution", Text="权限管理", Icon = "icon-save" } }} },
+                        Icon="icon-save"
+                    }
                 };
-                Context.MenuGroupRepositry.Add(mg);
-                var roleMg = new RoleMenuGroup() { ApplicationRoleId = role.Id, MenuGroupId = mg.Id };
-                Context.RoleMenuGroupRepositry.Add(roleMg);
+                db.Set<ApplicationRole>().Add(role);
+                mgL.ForEach(mg => {
+                    db.MenuGroups.Add(mg);
+                    db.SaveChanges();
+                    var roleMg = new RoleMenuGroup() { ApplicationRoleId = role.Id, MenuGroupId = mg.Id };
+                    db.RoleMenuGroups.Add(roleMg);
+                    foreach (var m in mg.Menus)
+                    {
+                        role.Menus.Add(m);
+                        foreach(var i in m.MenuItems)
+                        {
+                            role.MenuItems.Add(i);
+                        }
+                    }
+                });
+                db.SaveChanges();
             }
           
             var user = userManager.FindByName(name);

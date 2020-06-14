@@ -3,7 +3,7 @@ namespace WebApi.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Identity : DbMigration
+    public partial class P : DbMigration
     {
         public override void Up()
         {
@@ -145,7 +145,9 @@ namespace WebApi.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Title = c.String(),
+                        Icon = c.String(),
                         MenuGroupId = c.Int(nullable: false),
+                        ApplicationRoleId = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.MenuGroups", t => t.MenuGroupId, cascadeDelete: true)
@@ -158,24 +160,12 @@ namespace WebApi.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Text = c.String(),
                         Href = c.String(),
+                        Icon = c.String(),
                         MenuId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Menus", t => t.MenuId, cascadeDelete: true)
                 .Index(t => t.MenuId);
-            
-            CreateTable(
-                "dbo.RoleMenuGroups",
-                c => new
-                    {
-                        MenuGroupId = c.Int(nullable: false),
-                        ApplicationRoleId = c.String(nullable: false, maxLength: 128),
-                    })
-                .PrimaryKey(t => new { t.MenuGroupId, t.ApplicationRoleId })
-                .ForeignKey("dbo.MenuGroups", t => t.MenuGroupId, cascadeDelete: true)
-                .ForeignKey("dbo.AspNetRoles", t => t.ApplicationRoleId, cascadeDelete: true)
-                .Index(t => t.MenuGroupId)
-                .Index(t => t.ApplicationRoleId);
             
             CreateTable(
                 "dbo.AspNetRoles",
@@ -188,15 +178,58 @@ namespace WebApi.Migrations
                 .PrimaryKey(t => t.Id)
                 .Index(t => t.Name, unique: true, name: "RoleNameIndex");
             
+            CreateTable(
+                "dbo.RoleMenuGroups",
+                c => new
+                    {
+                        MenuGroupId = c.Int(nullable: false),
+                        ApplicationRoleId = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => new { t.MenuGroupId, t.ApplicationRoleId })
+                .ForeignKey("dbo.AspNetRoles", t => t.ApplicationRoleId, cascadeDelete: true)
+                .ForeignKey("dbo.MenuGroups", t => t.MenuGroupId, cascadeDelete: true)
+                .Index(t => t.MenuGroupId)
+                .Index(t => t.ApplicationRoleId);
+            
+            CreateTable(
+                "dbo.ApplicationRoleMenuItems",
+                c => new
+                    {
+                        ApplicationRole_Id = c.String(nullable: false, maxLength: 128),
+                        MenuItem_Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.ApplicationRole_Id, t.MenuItem_Id })
+                .ForeignKey("dbo.AspNetRoles", t => t.ApplicationRole_Id, cascadeDelete: true)
+                .ForeignKey("dbo.MenuItems", t => t.MenuItem_Id, cascadeDelete: true)
+                .Index(t => t.ApplicationRole_Id)
+                .Index(t => t.MenuItem_Id);
+            
+            CreateTable(
+                "dbo.ApplicationRoleMenus",
+                c => new
+                    {
+                        ApplicationRole_Id = c.String(nullable: false, maxLength: 128),
+                        Menu_Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.ApplicationRole_Id, t.Menu_Id })
+                .ForeignKey("dbo.AspNetRoles", t => t.ApplicationRole_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Menus", t => t.Menu_Id, cascadeDelete: true)
+                .Index(t => t.ApplicationRole_Id)
+                .Index(t => t.Menu_Id);
+            
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.RoleMenuGroups", "ApplicationRoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.RoleMenuGroups", "MenuGroupId", "dbo.MenuGroups");
             DropForeignKey("dbo.Menus", "MenuGroupId", "dbo.MenuGroups");
             DropForeignKey("dbo.MenuItems", "MenuId", "dbo.Menus");
+            DropForeignKey("dbo.ApplicationRoleMenus", "Menu_Id", "dbo.Menus");
+            DropForeignKey("dbo.ApplicationRoleMenus", "ApplicationRole_Id", "dbo.AspNetRoles");
+            DropForeignKey("dbo.ApplicationRoleMenuItems", "MenuItem_Id", "dbo.MenuItems");
+            DropForeignKey("dbo.ApplicationRoleMenuItems", "ApplicationRole_Id", "dbo.AspNetRoles");
+            DropForeignKey("dbo.RoleMenuGroups", "ApplicationRoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.OrderDetails", "ApplicationUser_Id", "dbo.AspNetUsers");
             DropForeignKey("dbo.OrderDetails", "ProductId", "dbo.Products");
@@ -206,9 +239,13 @@ namespace WebApi.Migrations
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.CartItems", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.CartItems", "ProductId", "dbo.Products");
-            DropIndex("dbo.AspNetRoles", "RoleNameIndex");
+            DropIndex("dbo.ApplicationRoleMenus", new[] { "Menu_Id" });
+            DropIndex("dbo.ApplicationRoleMenus", new[] { "ApplicationRole_Id" });
+            DropIndex("dbo.ApplicationRoleMenuItems", new[] { "MenuItem_Id" });
+            DropIndex("dbo.ApplicationRoleMenuItems", new[] { "ApplicationRole_Id" });
             DropIndex("dbo.RoleMenuGroups", new[] { "ApplicationRoleId" });
             DropIndex("dbo.RoleMenuGroups", new[] { "MenuGroupId" });
+            DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.MenuItems", new[] { "MenuId" });
             DropIndex("dbo.Menus", new[] { "MenuGroupId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
@@ -222,8 +259,10 @@ namespace WebApi.Migrations
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
             DropIndex("dbo.CartItems", new[] { "ProductId" });
             DropIndex("dbo.CartItems", new[] { "UserId" });
-            DropTable("dbo.AspNetRoles");
+            DropTable("dbo.ApplicationRoleMenus");
+            DropTable("dbo.ApplicationRoleMenuItems");
             DropTable("dbo.RoleMenuGroups");
+            DropTable("dbo.AspNetRoles");
             DropTable("dbo.MenuItems");
             DropTable("dbo.Menus");
             DropTable("dbo.MenuGroups");

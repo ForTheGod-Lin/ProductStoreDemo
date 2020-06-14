@@ -9,30 +9,147 @@
     <meta charset="UTF-8">
     <title>后台管理系统</title>
    @Styles.Render("~/Content/EasyUICss")
- 
+    <style>
+        .icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            padding-right:5px;
+        }
+        .top_menu {
+            display: block;
+            width: 30px;
+            height: 30px;
+        }
+        .hover {
+            background: #B3DFDA;
+            opacity:0.5;
+        }
+        .selected {
+            background: #B3DFDA;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body class="easyui-layout">
-    <div data-options="region:'north',border:false" title="后台管理系统" style="height:130px;background:#B3DFDA;">
-       @Html.Action("MenuGroup")
+    <div data-options="region:'north',border:false" title="后台管理系统" style="height:120px;">
+        <div id="top_menu" style="float:right">
+  
+        </div>
     </div>
-    <div id="nav" data-options="region:'west',split:true" title="菜单导航" style="width:180px;"> </div>
-     <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;text-align:center;">
+    <div  data-options="region:'west',split:true" title="菜单导航" style="width:180px;">
+        <div id="nav" class="easyui-accordion" fit="true" border="false"></div>
+        </div>
+        <div id="bottom" data-options="region:'south',border:false" style="height:50px;background:#A9FACD;text-align:center;">
             版权所有：L
         </div>
-     <div id="center" data-options="region:'center'">
-         <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
-     </div>
+        <div id="center" data-options="region:'center'">
+            <div id="tab" class="easyui-tabs" data-options="fit:'true'"></div>
+        </div>
 
         @Scripts.Render("~/bundles/EasyUI")
         <script>
             $(function () {
+                $.ajax({
+                    url: "@Url.Action("MenuGroups")",
+                    success: function (data) {
+                        ps.initMenus(data);
+                    }
+                });
+     
+            });
+            var ps = (function ($) {
+                var ps = {
+                    createDialog: function () {
+                        $("<div>").attr({
+                            id: "dialog"
+                        }).prependTo($("body"));
+                    },
+                    initMenus: function (data) {
+                        $.each(data, function (index, item) {
+                            $("<div id=" + index + '><a  href="##"><span class="top_menu ' + item.Icon + '"></span><span>' + item.Name + "</span></a></div>").css({
+                                float: "right",
+                                padding: "10px"
+                            }).click(function () {
+                                menu.initLeftMenu(item);
+                                $('#top_menu div').removeClass("selected");
+                                $(this).addClass("selected");
+                            }).hover(function () {
+                                $(this).addClass("hover");
+                            }, function () {
+                                $(this).removeClass("hover")
+                            }).appendTo($("#top_menu"));
+                        });
+                        $("#0").trigger("click");
+                    }
+                };
 
-            })
-            function createDialog() {
-                $("<div>").attr({
-                    id: "dialog"
-                }).prependTo($("body"));
-            }
+                var menu = {
+                    initLeftMenu: function (data) {
+                        menu.clear();
+                        $(data.Menus).each(function (index, item) {
+                            menu.add(item);
+                        });
+                    },
+                    clear: function () {
+                        var length = $("#nav").accordion('panels').length;
+                        for (var i = 0; i < length; i++) {
+                            $("#nav").accordion('remove', 0);
+                        }
+                    },
+                    add: function (data) {
+                        var $ul = $("<ul>").css({
+                            'padding': '10px'
+                        });
+                        $.each(data.MenuItems, function (index,item) {
+                            var $li = $("<li>").css({
+                                'padding-bottom': '10px'
+                            });
+                            var html = '<span class="icon ' + item.Icon + '"></span><span>' + item.Text + "</span>";
+                            $("<a>").attr({
+                                href: item.Href,
+                                icon:item.Icon
+                            }).html(html).click(menu.addTab).hover(function () {
+                                $(this).addClass("hover");
+                            }, function () {
+                                $(this).removeClass("hover")
+                            }).appendTo($li);
+                            $li.appendTo($ul);
+                        });
+                        $("#nav").accordion('add', {
+                            title: data.Title,
+                            content: $ul,
+                            iconCls: data.Icon
+                        })
+                        var pp = $('#nav').accordion('panels');
+                        var t = pp[0].panel('options').title;
+                        $('#nav').accordion('select', t);
+                    },
+                    addTab: function () {
+                        var src = $(this).attr("href");
+                        var title = $(this).text();
+                        var icon = $(this).attr("icon");
+                        var isExist = $("#tab").tabs('exists', title);
+                        if (!isExist) {
+                            $("#tab").tabs('add', {
+                                title: title,
+                                href: src,
+                                iconCls: icon,
+                                closable: true
+                            });
+                        }
+                        else {
+                            $("#tab").tabs('select', title);
+
+                        }
+                        $('#nav li').removeClass("selected");
+                        $(this).parent().addClass("selected");
+                        return false;
+                    },
+                };
+
+                return ps;
+            })(jQuery);
         </script>
 </body>
 </html>

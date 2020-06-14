@@ -19,8 +19,6 @@ namespace WebApi.Models
             MenuGroupRepositry =new  MenuGroupRepositry(context);
             UserManager = context.GetUserManager<ApplicationUserManager>();
             RoleManager = context.Get<ApplicationRoleManager>();
-            MenuRepositry = new MenuRepositry(context);
-            RoleMenuGroupRepositry = new RoleMenuGroupRepositry(context);
         }
         public CommonContext()
         {
@@ -31,8 +29,6 @@ namespace WebApi.Models
             MenuGroupRepositry = new MenuGroupRepositry();
             UserManager = new ApplicationUserManager(new UserStore<ApplicationUser>(new ApplicationDbContext()));
             RoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole>(new ApplicationDbContext()));
-            MenuRepositry = new MenuRepositry();
-            RoleMenuGroupRepositry = new RoleMenuGroupRepositry();
         }
         public static CommonContext Create(IdentityFactoryOptions<CommonContext> options,
             IOwinContext context)
