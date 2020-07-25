@@ -58,7 +58,7 @@
                 });
      
             });
-            var ps = (function ($) {
+            var ps = function ($) {
                 var ps = {
                     createDialog: function () {
                         $("<div>").attr({
@@ -88,8 +88,11 @@
                     initLeftMenu: function (data) {
                         menu.clear();
                         $(data.Menus).each(function (index, item) {
-                            menu.add(item);
+                            menu.addMenu(item);
                         });
+                        var pp = $('#nav').accordion('panels');
+                        var t = pp[0].panel('options').title;
+                        $('#nav').accordion('select', t);
                     },
                     clear: function () {
                         var length = $("#nav").accordion('panels').length;
@@ -97,7 +100,7 @@
                             $("#nav").accordion('remove', 0);
                         }
                     },
-                    add: function (data) {
+                    addMenu: function (data) {
                         var $ul = $("<ul>").css({
                             'padding': '10px'
                         });
@@ -121,9 +124,6 @@
                             content: $ul,
                             iconCls: data.Icon
                         })
-                        var pp = $('#nav').accordion('panels');
-                        var t = pp[0].panel('options').title;
-                        $('#nav').accordion('select', t);
                     },
                     addTab: function () {
                         var src = $(this).attr("href");
@@ -149,7 +149,7 @@
                 };
 
                 return ps;
-            })(jQuery);
+            }(jQuery);
         </script>
 </body>
 </html>

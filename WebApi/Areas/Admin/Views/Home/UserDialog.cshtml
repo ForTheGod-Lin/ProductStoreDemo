@@ -4,8 +4,6 @@
 @using WebApi.Models
 @{
     Layout = null;
-   
-
 }
 
 <form id="userFm" method="post" style="margin:0;padding:20px 50px">
@@ -23,14 +21,10 @@
         @Html.TextBoxFor(model => model.Email, new { @class = "easyui-textbox", required = "true", validType = "email", label = Html.DisplayNameFor(m => m.Email), style = "width:100%" })
     </div>
     <div style="margin-bottom:10px">
-
         @Html.TextBox(Html.NameFor(model => model.EmailConfirmed).ToString(), "true", new { @class = "easyui-checkbox", label = Html.DisplayNameFor(model => model.EmailConfirmed) })
-
     </div>
     <div style="margin-bottom:10px">
-
         @Html.DropDownListFor(model => model.Status, new SelectList(Enum.GetNames(typeof(WebApi.Models.Status)), Enum.GetNames(typeof(WebApi.Models.Status))[0]), new { @class = "easyui-combobox", required = "true", label = Html.DisplayNameFor(m => m.Status), style = "width:100%" })
-
     </div>
     <div style="margin-bottom:10px">
         @foreach (var r in (IEnumerable<SelectListItem>)ViewBag.selectedRoles)
@@ -38,6 +32,5 @@
             <input type="checkbox" name="RoleNames" value="@r.Text" checked="@r.Selected" />
             @Html.Label(r.Text)
         }
-
     </div>
 </form>
