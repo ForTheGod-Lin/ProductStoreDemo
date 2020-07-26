@@ -32,7 +32,7 @@
     </style>
 </head>
 <body class="easyui-layout">
-    <div data-options="region:'north',border:false" title="后台管理系统" style="height:120px;">
+    <div data-options="region:'north',border:false" title="后台管理系统" style="height:100px">
         <div id="top_menu" style="float:right">
   
         </div>
@@ -67,20 +67,18 @@
                     },
                     initMenus: function (data) {
                         $.each(data, function (index, item) {
-                            $("<div id=" + index + '><a  href="##"><span class="top_menu ' + item.Icon + '"></span><span>' + item.Name + "</span></a></div>").css({
-                                float: "right",
-                                padding: "10px"
+                            $('<a  href="##"></a>').linkbutton({
+                                iconCls: item.Icon,
+                                size: 'large',
+                                iconAlign: 'top',
+                                text: item.Name,
+                                toggle: true,
+                                group:'top'
                             }).click(function () {
                                 menu.initLeftMenu(item);
-                                $('#top_menu div').removeClass("selected");
-                                $(this).addClass("selected");
-                            }).hover(function () {
-                                $(this).addClass("hover");
-                            }, function () {
-                                $(this).removeClass("hover")
                             }).appendTo($("#top_menu"));
                         });
-                        $("#0").trigger("click");
+                        $("#top_menu a:first-child").trigger("click");
                     }
                 };
 
@@ -88,7 +86,7 @@
                     initLeftMenu: function (data) {
                         menu.clear();
                         $(data.Menus).each(function (index, item) {
-                            menu.addMenu(item);
+                            menu.addMenu(item,index);
                         });
                         var pp = $('#nav').accordion('panels');
                         var t = pp[0].panel('options').title;
@@ -100,40 +98,31 @@
                             $("#nav").accordion('remove', 0);
                         }
                     },
-                    addMenu: function (data) {
-                        var $ul = $("<ul>").css({
-                            'padding': '10px'
-                        });
-                        $.each(data.MenuItems, function (index,item) {
-                            var $li = $("<li>").css({
-                                'padding-bottom': '10px'
-                            });
-                            var html = '<span class="icon ' + item.Icon + '"></span><span>' + item.Text + "</span>";
-                            $("<a>").attr({
-                                href: item.Href,
-                                icon:item.Icon
-                            }).html(html).click(menu.addTab).hover(function () {
-                                $(this).addClass("hover");
-                            }, function () {
-                                $(this).removeClass("hover")
-                            }).appendTo($li);
-                            $li.appendTo($ul);
+                    addMenu: function (data,index) {
+                        var $div = $('<div>');
+                        $.each(data.MenuItems, function (i, item) {
+                            var $a = $('<a href="##">').linkbutton({
+                                iconCls: item.Icon,
+                                text: item.Text,
+                                plain: true,
+                                group: index.toString(),
+                                toggle:true
+                            }).css({
+                                width:'100%'
+                            }).click(function () { menu.addTab(item.Href, item.Icon, item.Text) }).appendTo($div);
                         });
                         $("#nav").accordion('add', {
                             title: data.Title,
-                            content: $ul,
+                            content: $div,
                             iconCls: data.Icon
                         })
                     },
-                    addTab: function () {
-                        var src = $(this).attr("href");
-                        var title = $(this).text();
-                        var icon = $(this).attr("icon");
+                    addTab: function (href, icon, title) {
                         var isExist = $("#tab").tabs('exists', title);
                         if (!isExist) {
                             $("#tab").tabs('add', {
                                 title: title,
-                                href: src,
+                                href: href,
                                 iconCls: icon,
                                 closable: true
                             });
@@ -142,9 +131,6 @@
                             $("#tab").tabs('select', title);
 
                         }
-                        $('#nav li').removeClass("selected");
-                        $(this).parent().addClass("selected");
-                        return false;
                     },
                 };
 

@@ -24,15 +24,15 @@ namespace WebApi
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
             bundles.Add(new StyleBundle("~/Content/EasyUICss").Include(
-                "~/Content/jquery-easyui-1.7.0/themes/default/easyui.css",
-                "~/Content/jquery-easyui-1.7.0/themes/icon.css",
-                "~/Content/jquery-easyui-1.7.0/themes/color.css",
-                "~/Content/jquery-easyui-1.7.0/demo/demo.css"));
+                "~/Content/jquery-easyui-1.8.6/themes/bootstrap/easyui.css",
+                "~/Content/jquery-easyui-1.8.6/themes/icon.css",
+                "~/Content/jquery-easyui-1.8.6/themes/color.css",
+                "~/Content/jquery-easyui-1.8.6/demo/demo.css"));
 
             bundles.Add(new ScriptBundle("~/bundles/EasyUI").Include(
-                "~/Content/jquery-easyui-1.7.0/jquery.min.js",
-                "~/Content/jquery-easyui-1.7.0/jquery.easyui.min.js",
-                "~/Content/jquery-easyui-1.7.0/locale/easyui-lang-zh_CN.js"));
+                "~/Content/jquery-easyui-1.8.6/jquery.min.js",
+                "~/Content/jquery-easyui-1.8.6/jquery.easyui.min.js",
+                "~/Content/jquery-easyui-1.8.6/locale/easyui-lang-zh_CN.js"));
         }
     }
    

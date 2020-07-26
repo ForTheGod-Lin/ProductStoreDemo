@@ -179,6 +179,7 @@ namespace WebApi.Models {
                     new MenuGroup()
                     {
                         Name = "基础管理",
+                        Icon="icon-large-shapes",
                         Menus = new[]{
                     new Menu(){
                     Title="后台用户系统管理" ,Icon="icon-save",MenuItems=new[]{
@@ -186,13 +187,12 @@ namespace WebApi.Models {
                          new MenuItem(){ Href="/Admin/Home/RoleIndex",Text="角色管理",Icon="icon-save"}}},
                     new Menu(){Title="后台产品系统管理",Icon="icon-save",MenuItems=new[]{
                         new MenuItem() { Href= "/Admin/Home/ProductIndex" ,Text="产品管理",Icon="icon-save"}}}},
-                        Icon="icon-save"
                     },
                     new MenuGroup()
                     {
                         Name="菜单管理",
                         Menus=new[]{new Menu() { Title = "角色权限管理", Icon = "icon-save", MenuItems = new[] {new MenuItem() { Href= "/Admin/Home/MenuDistribution", Text="权限管理", Icon = "icon-save" } }} },
-                        Icon="icon-save"
+                        Icon="icon-large-clipart"
                     }
                 };
                 db.Set<ApplicationRole>().Add(role);
